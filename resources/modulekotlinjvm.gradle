@@ -40,7 +40,9 @@ task printClasspath {
     }
 }
 
-ext.implementCommon = { Project project ->
+ext.implementCommon = { projectPath ->
+    evaluationDependsOn(projectPath)
+    def project = project(projectPath)
     dependencies.implement project
     dependencies.compileOnly project
     dependencies.testCompileOnly project
