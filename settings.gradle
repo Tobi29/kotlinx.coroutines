@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 
+include "kotlinx-coroutines-core-common"
 include "kotlinx-coroutines-core"

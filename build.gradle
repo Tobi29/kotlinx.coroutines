@@ -52,6 +52,9 @@ allprojects {
             url "https://maven-eclipse.github.io/maven"
         }
         maven {
+            url "https://dl.bintray.com/devexperts/Maven"
+        }
+        maven {
             url "https://jitpack.io"
         }
     }

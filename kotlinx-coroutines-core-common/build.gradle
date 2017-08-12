@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-apply from: "$rootDir/resources/modulekotlinjvm.gradle"
-
-implementCommon(":kotlinx-coroutines-core-common")
+apply from: "$rootDir/resources/modulekotlin.gradle"
 
 dependencies {
-    compile rootProject.ext.kotlinSTDJVM
-    testCompile "junit:junit:4.12"
-    testCompile "com.devexperts.lincheck:core:1.8.1"
+    compile rootProject.ext.kotlinSTD
 }
