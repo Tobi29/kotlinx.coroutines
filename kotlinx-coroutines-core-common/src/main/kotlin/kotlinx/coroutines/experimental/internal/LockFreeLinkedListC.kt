@@ -16,8 +16,6 @@
 
 package kotlinx.coroutines.experimental.internal
 
-import kotlin.jvm.JvmField
-
 internal typealias Node = LockFreeLinkedListNode
 
 @PublishedApi
@@ -50,7 +48,7 @@ public typealias RemoveFirstDesc<T> = LockFreeLinkedListNode.RemoveFirstDesc<T>
  */
 public typealias AddLastDesc<T> = LockFreeLinkedListNode.AddLastDesc<T>
 
-internal class Removed(@JvmField val ref: Node) {
+internal class Removed(/* @JvmField */ val ref: Node) {
     override fun toString(): String = "Removed[$ref]"
 }
 
