@@ -18,13 +18,13 @@ package kotlinx.coroutines.experimental
 
 import java.util.concurrent.locks.LockSupport
 
-internal interface TimeSource {
-    fun nanoTime(): Long
-    fun trackTask(block: Runnable): Runnable
-    fun unTrackTask()
-    fun registerTimeLoopThread()
-    fun unregisterTimeLoopThread()
-    fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
+impl internal interface TimeSource {
+    impl fun nanoTime(): Long
+    impl fun trackTask(block: Runnable): Runnable
+    impl fun unTrackTask()
+    impl fun registerTimeLoopThread()
+    impl fun unregisterTimeLoopThread()
+    impl fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
     fun unpark(thread: Thread)
 }
 
@@ -44,4 +44,4 @@ internal object DefaultTimeSource : TimeSource {
     }
 }
 
-internal var timeSource: TimeSource = DefaultTimeSource
+impl internal var timeSource: TimeSource = DefaultTimeSource
