@@ -16,21 +16,9 @@
 
 package kotlinx.coroutines.experimental
 
-import kotlin.coroutines.experimental.AbstractCoroutineContextElement
 import kotlin.coroutines.experimental.CoroutineContext
 
-
-/**
- * Helper function for coroutine builder implementations to handle uncaught exception in coroutines.
- * It tries to handle uncaught exception in the following way:
- * * If there is [CoroutineExceptionHandler] in the context, then it is used.
- * * Otherwise, if exception is [CancellationException] then it is ignored
- *   (because that is the supposed mechanism to cancel the running coroutine)
- * * Otherwise, if there is a [Job] in the context, then [Job.cancel] is invoked and if it
- *   returns `true` (it was still active), then the exception is considered to be handled.
- * * Otherwise, current thread's [Thread.uncaughtExceptionHandler] is used.
- */
-fun handleCoroutineException(context: CoroutineContext, exception: Throwable) {
+impl fun handleCoroutineException(context: CoroutineContext, exception: Throwable) {
     context[CoroutineExceptionHandler]?.let {
         it.handleException(context, exception)
         return
@@ -43,39 +31,3 @@ fun handleCoroutineException(context: CoroutineContext, exception: Throwable) {
     val currentThread = Thread.currentThread()
     currentThread.uncaughtExceptionHandler.uncaughtException(currentThread, exception)
 }
-
-/**
- * An optional element on the coroutine context to handle uncaught exceptions.
- * See [handleCoroutineException].
- */
-public interface CoroutineExceptionHandler : CoroutineContext.Element {
-    /**
-     * Key for [CoroutineExceptionHandler] instance in the coroutine context.
-     */
-    companion object Key : CoroutineContext.Key<CoroutineExceptionHandler> {
-        /**
-         * Creates new [CoroutineExceptionHandler] instance.
-         * @param handler a function which handles exception thrown by a coroutine
-         * @suppress **Deprecated**
-         */
-        @Deprecated("Replaced with top-level function", level = DeprecationLevel.HIDDEN)
-        public operator inline fun invoke(crossinline handler: (CoroutineContext, Throwable) -> Unit): CoroutineExceptionHandler =
-           CoroutineExceptionHandler(handler)
-    }
-
-    /**
-     * Handles uncaught [exception] in the given [context]. It is invoked
-     * if coroutine has an uncaught exception. See [handleCoroutineException].
-     */
-    public fun handleException(context: CoroutineContext, exception: Throwable)
-}
-
-/**
- * Creates new [CoroutineExceptionHandler] instance.
- * @param handler a function which handles exception thrown by a coroutine
- */
-public inline fun CoroutineExceptionHandler(crossinline handler: (CoroutineContext, Throwable) -> Unit): CoroutineExceptionHandler =
-    object: AbstractCoroutineContextElement(CoroutineExceptionHandler), CoroutineExceptionHandler {
-        override fun handleException(context: CoroutineContext, exception: Throwable) =
-            handler.invoke(context, exception)
-    }

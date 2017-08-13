@@ -16,9 +16,7 @@
 
 package kotlinx.coroutines.experimental.intrinsics
 
-import kotlinx.coroutines.experimental.resumeCancellable
 import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.createCoroutine
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.experimental.suspendCoroutine

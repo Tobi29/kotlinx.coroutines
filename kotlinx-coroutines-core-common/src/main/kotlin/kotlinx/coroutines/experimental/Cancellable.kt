@@ -32,4 +32,3 @@ internal fun <T> (suspend () -> T).startCoroutineCancellable(completion: Continu
  */
 internal fun <R, T> (suspend (R) -> T).startCoroutineCancellable(receiver: R, completion: Continuation<T>) =
     createCoroutineUnchecked(receiver, completion).resumeCancellable(Unit)
-

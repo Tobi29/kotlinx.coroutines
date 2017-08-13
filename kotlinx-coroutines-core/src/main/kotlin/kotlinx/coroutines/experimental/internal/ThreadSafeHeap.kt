@@ -16,6 +16,8 @@
 
 package kotlinx.coroutines.experimental.internal
 
+import kotlinx.coroutines.experimental.Volatile
+
 /**
  * @suppress **This is unstable API and it is subject to change.**
  */

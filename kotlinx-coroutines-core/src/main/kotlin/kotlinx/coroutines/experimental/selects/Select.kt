@@ -90,48 +90,6 @@ public interface SelectBuilder<in R> {
 }
 
 /**
- * Internal representation of select instance. This instance is called _selected_ when
- * the clause to execute is already picked.
- *
- * @suppress **This is unstable API and it is subject to change.**
- */
-public interface SelectInstance<in R> {
-    /**
-     * Returns `true` when this [select] statement had already picked a clause to execute.
-     */
-    public val isSelected: Boolean
-
-    /**
-     * Tries to select this instance.
-     */
-    public fun trySelect(idempotent: Any?): Boolean
-
-    /**
-     * Performs action atomically with [trySelect].
-     */
-    public fun performAtomicTrySelect(desc: AtomicDesc): Any?
-
-    /**
-     * Performs action atomically when [isSelected] is `false`.
-     */
-    public fun performAtomicIfNotSelected(desc: AtomicDesc): Any?
-
-    /**
-     * Returns completion continuation of this select instance.
-     * This select instance must be _selected_ first.
-     * All resumption through this instance happen _directly_ (as if `mode` is [MODE_DIRECT]).
-     */
-    public val completion: Continuation<R>
-
-    /**
-     * Resumes this instance with [MODE_CANCELLABLE].
-     */
-    public fun resumeSelectCancellableWithException(exception: Throwable)
-
-    public fun disposeOnSelect(handle: DisposableHandle)
-}
-
-/**
  * Waits for the result of multiple suspending functions simultaneously, which are specified using _clauses_
  * in the [builder] scope of this select invocation. The caller is suspended until one of the clauses
  * is either _selected_ or _fails_.
