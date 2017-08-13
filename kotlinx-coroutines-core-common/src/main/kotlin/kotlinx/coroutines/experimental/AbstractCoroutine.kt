@@ -58,7 +58,7 @@ public abstract class AbstractCoroutine<in T>(
                     if (exception != state.exception) handleCoroutineException(context, exception)
                     return
                 }
-                else -> throw IllegalStateException("Already resumed, but got exception $exception", exception)
+                else -> throw IllegalStateException("Already resumed, but got exception $exception")
             }
         }
     }
