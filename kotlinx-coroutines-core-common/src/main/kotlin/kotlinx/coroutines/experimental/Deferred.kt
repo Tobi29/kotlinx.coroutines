@@ -16,9 +16,7 @@
 
 package kotlinx.coroutines.experimental
 
-import kotlinx.coroutines.experimental.selects.SelectBuilder
 import kotlinx.coroutines.experimental.selects.SelectInstance
-import kotlinx.coroutines.experimental.selects.select
 import kotlin.coroutines.experimental.CoroutineContext
 
 /**

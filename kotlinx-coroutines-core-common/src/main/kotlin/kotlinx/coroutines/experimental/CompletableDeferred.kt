@@ -94,7 +94,7 @@ private class CompletableDeferredImpl<T> : JobSupport(true), CompletableDeferred
             when (state) {
                 is Incomplete -> {
                     // actually, we don't care about the mode here at all, so just use a default
-                    if (updateState(state, value, mode = MODE_ATOMIC_DEFAULT))
+                    if (updateState(state, value, MODE_ATOMIC_DEFAULT))
                         return true
                 }
                 else -> return false
@@ -107,7 +107,7 @@ private class CompletableDeferredImpl<T> : JobSupport(true), CompletableDeferred
             when (state) {
                 is Incomplete -> {
                     // actually, we don't care about the mode here at all, so just use a default
-                    if (updateState(state, CompletedExceptionally(exception), mode = MODE_ATOMIC_DEFAULT))
+                    if (updateState(state, CompletedExceptionally(exception), MODE_ATOMIC_DEFAULT))
                         return true
                 }
                 else -> return false
