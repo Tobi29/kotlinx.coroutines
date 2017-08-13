@@ -188,7 +188,61 @@ public interface Job : CoroutineContext.Element {
      * This function should not be used in general application code.
      * Implementations of `CompletionHandler` must be fast and _lock-free_.
      */
+    public fun invokeOnCompletion(handler: (Throwable?) -> Unit): DisposableHandle =
+            invokeOnCompletion(object : CompletionHandler {
+                override fun invoke(e: Throwable?) = handler(e)
+            })
+
+    /**
+     * Registers handler that is **synchronously** invoked once on completion of this job.
+     * When job is already complete, then the handler is immediately invoked
+     * with a job's cancellation cause or `null`. Otherwise, handler will be invoked once when this
+     * job is complete.
+     *
+     * The resulting [DisposableHandle] can be used to [dispose][DisposableHandle.dispose] the
+     * registration of this handler and release its memory if its invocation is no longer needed.
+     * There is no need to dispose the handler after completion of this job. The references to
+     * all the handlers are released when this job completes.
+     *
+     * Note, that the handler is not invoked on invocation of [cancel] when
+     * job becomes _cancelling_, but only when the corresponding coroutine had finished execution
+     * of its code and became _cancelled_. There is an overloaded version of this function
+     * with `onCancelling` parameter to receive notification on _cancelling_ state.
+     *
+     * **Note**: This function is a part of internal machinery that supports parent-child hierarchies
+     * and allows for implementation of suspending functions that wait on the Job's state.
+     * This function should not be used in general application code.
+     * Implementations of `CompletionHandler` must be fast and _lock-free_.
+     */
     public fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle
+
+    /**
+     * Registers handler that is **synchronously** invoked once on cancellation or completion of this job.
+     * When job is already complete, then the handler is immediately invoked
+     * with a job's cancellation cause or `null`. Otherwise, handler will be invoked once when this
+     * job is cancelled or complete.
+     *
+     * Invocation of this handler on a transition to a transient _cancelling_ state
+     * is controlled by [onCancelling] boolean parameter.
+     * The handler is invoked on invocation of [cancel] when
+     * job becomes _cancelling_ when [onCancelling] parameters is set to `true`. However,
+     * when this [Job] is not backed by a coroutine, like [CompletableDeferred] or [CancellableContinuation]
+     * (both of which do not posses a _cancelling_ state), then the value of [onCancelling] parameter is ignored.
+     *
+     * The resulting [DisposableHandle] can be used to [dispose][DisposableHandle.dispose] the
+     * registration of this handler and release its memory if its invocation is no longer needed.
+     * There is no need to dispose the handler after completion of this job. The references to
+     * all the handlers are released when this job completes.
+     *
+     * **Note**: This function is a part of internal machinery that supports parent-child hierarchies
+     * and allows for implementation of suspending functions that wait on the Job's state.
+     * This function should not be used in general application code.
+     * Implementations of `CompletionHandler` must be fast and _lock-free_.
+     */
+    public fun invokeOnCompletion(handler: (Throwable?) -> Unit, onCancelling: Boolean): DisposableHandle =
+            invokeOnCompletion(object : CompletionHandler {
+                override fun invoke(e: Throwable?) = handler(e)
+            }, onCancelling)
 
     /**
      * Registers handler that is **synchronously** invoked once on cancellation or completion of this job.
@@ -287,7 +341,9 @@ public interface DisposableHandle : Job.Registration {
  * This type should not be used in general application code.
  * Implementations of `CompletionHandler` must be fast and _lock-free_.
  */
-public typealias CompletionHandler = (Throwable?) -> Unit
+public interface CompletionHandler {
+    operator fun invoke(e: Throwable?)
+}
 
 /**
  * Thrown by cancellable suspending functions if the [Job] of the coroutine is cancelled while it is suspending.
