@@ -16,15 +16,6 @@
 
 package kotlinx.coroutines.experimental
 
-import java.util.concurrent.Future
-
-/**
- * An implementation of [DisposableHandle] that cancels the specified future on dispose.
- */
-public class DisposableFutureHandle(private val future: Future<*>) : DisposableHandle {
-    override fun dispose() {
-        future.cancel(false)
-    }
-
-    override fun toString(): String = "DisposableFutureHandle[$future]"
-}
+private const val DELAYED = 0
+private const val REMOVED = 1
+private const val RESCHEDULED = 2

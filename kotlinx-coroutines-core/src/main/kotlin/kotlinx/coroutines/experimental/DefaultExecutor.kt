@@ -19,19 +19,19 @@ package kotlinx.coroutines.experimental
 import java.util.concurrent.TimeUnit
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-internal object DefaultExecutor : EventLoopBase(), Runnable {
+impl internal object DefaultExecutor : EventLoopBase(), Runnable {
 
-    override val canComplete: Boolean get() = false
-    override val isCompleted: Boolean get() = false
+    impl override val canComplete: Boolean get() = false
+    impl override val isCompleted: Boolean get() = false
 
     private const val DEFAULT_KEEP_ALIVE = 1000L // in milliseconds
 
     private val KEEP_ALIVE_NANOS = TimeUnit.MILLISECONDS.toNanos(
-        try {
-            java.lang.Long.getLong("kotlinx.coroutines.DefaultExecutor.keepAlive", DEFAULT_KEEP_ALIVE)
-        } catch (e: SecurityException) {
-            DEFAULT_KEEP_ALIVE
-        })
+            try {
+                java.lang.Long.getLong("kotlinx.coroutines.DefaultExecutor.keepAlive", DEFAULT_KEEP_ALIVE)
+            } catch (e: SecurityException) {
+                DEFAULT_KEEP_ALIVE
+            })
 
     @Volatile
     private var _thread: Thread? = null
@@ -44,7 +44,7 @@ internal object DefaultExecutor : EventLoopBase(), Runnable {
     @Volatile
     private var debugStatus: Int = FRESH
 
-    override fun run() {
+    impl override fun run() {
         var shutdownNanos = Long.MAX_VALUE
         timeSource.registerTimeLoopThread()
         notifyStartup()
@@ -86,21 +86,21 @@ internal object DefaultExecutor : EventLoopBase(), Runnable {
 
     @Synchronized
     private fun createThreadSync() = _thread ?:
-        Thread(this, "kotlinx.coroutines.DefaultExecutor").apply {
-            _thread = this
-            isDaemon = true
-            start()
-        }
+            Thread(this, "kotlinx.coroutines.DefaultExecutor").apply {
+                _thread = this
+                isDaemon = true
+                start()
+            }
 
-    override fun unpark() {
+    impl override fun unpark() {
         timeSource.unpark(thread()) // as a side effect creates thread if it is not there
     }
 
-    override fun isCorrectThread(): Boolean = true
+    impl override fun isCorrectThread(): Boolean = true
 
     // used for tests
     @Synchronized
-    internal fun ensureStarted() {
+    impl internal fun ensureStarted() {
         assert(_thread == null) // ensure we are at a clean state
         debugStatus = FRESH
         createThreadSync() // create fresh thread
@@ -115,7 +115,7 @@ internal object DefaultExecutor : EventLoopBase(), Runnable {
 
     // used for tests
     @Synchronized
-    internal fun shutdown(timeout: Long) {
+    impl internal fun shutdown(timeout: Long) {
         if (_thread != null) {
             val deadline = System.currentTimeMillis() + timeout
             if (debugStatus == ACTIVE) debugStatus = SHUTDOWN_REQ

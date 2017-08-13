@@ -16,8 +16,7 @@
 
 package kotlinx.coroutines.experimental
 
-import kotlinx.coroutines.experimental.selects.SelectBuilder
-import kotlinx.coroutines.experimental.selects.select
+import java.lang.Runnable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext
@@ -58,10 +57,10 @@ public suspend fun <T> withTimeout(time: Long, unit: TimeUnit = TimeUnit.MILLISE
 }
 
 private open class TimeoutCompletion<U, in T: U>(
-    private val time: Long,
-    private val unit: TimeUnit,
-    @JvmField protected val cont: Continuation<U>
-) : JobSupport(active = true), Runnable, Continuation<T> {
+        private val time: Long,
+        private val unit: TimeUnit,
+        /* @JvmField */ protected val cont: Continuation<U>
+) : JobSupport(/* active = */ true), Runnable, Continuation<T> {
     @Suppress("LeakingThis")
     override val context: CoroutineContext = cont.context + this // mix in this Job into the context
     override fun run() { cancel(TimeoutException(time, unit, this)) }
@@ -108,9 +107,9 @@ public suspend fun <T> withTimeoutOrNull(time: Long, unit: TimeUnit = TimeUnit.M
 }
 
 private class TimeoutOrNullCompletion<T>(
-    time: Long,
-    unit: TimeUnit,
-    cont: Continuation<T?>
+        time: Long,
+        unit: TimeUnit,
+        cont: Continuation<T?>
 ) : TimeoutCompletion<T?, T>(time, unit, cont) {
     override fun resumeWithException(exception: Throwable) {
         // suppress inner timeout exception and replace it with null
@@ -121,7 +120,7 @@ private class TimeoutOrNullCompletion<T>(
 }
 
 private class TimeoutException(
-    time: Long,
-    unit: TimeUnit,
-    @JvmField val coroutine: Job
+        time: Long,
+        unit: TimeUnit,
+        /* @JvmField */ val coroutine: Job
 ) : CancellationException("Timed out waiting for $time $unit")
