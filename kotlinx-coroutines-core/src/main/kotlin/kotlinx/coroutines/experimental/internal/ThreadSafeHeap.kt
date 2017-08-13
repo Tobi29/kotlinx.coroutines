@@ -19,35 +19,30 @@ package kotlinx.coroutines.experimental.internal
 import kotlinx.coroutines.experimental.Volatile
 
 /**
- * @suppress **This is unstable API and it is subject to change.**
- */
-public interface ThreadSafeHeapNode {
-    public var index: Int
-}
-
-/**
  * Synchronized binary heap.
  *
  * @suppress **This is unstable API and it is subject to change.**
  */
-public class ThreadSafeHeap<T> where T: ThreadSafeHeapNode, T: Comparable<T> {
+impl public class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable<T> {
     private var a: Array<T?>? = null
 
-    @JvmField @PublishedApi @Volatile
-    internal var size = 0
+    @JvmField
+    @PublishedApi
+    @Volatile
+    impl internal var size = 0
 
-    public val isEmpty: Boolean get() = size == 0
+    impl public val isEmpty: Boolean get() = size == 0
 
-    public fun peek(): T? = synchronized(this) { firstImpl() }
+    impl public fun peek(): T? = synchronized(this) { firstImpl() }
 
-    public fun removeFirstOrNull(): T? = synchronized(this) {
+    impl public fun removeFirstOrNull(): T? = synchronized(this) {
         if (size > 0) {
             removeAtImpl(0)
         } else
             null
     }
 
-    public inline fun removeFirstIf(predicate: (T) -> Boolean): T? = synchronized(this) {
+    impl public inline fun removeFirstIf(predicate: (T) -> Boolean): T? = synchronized(this) {
         val first = firstImpl() ?: return@synchronized null
         if (predicate(first)) {
             removeAtImpl(0)
@@ -55,11 +50,11 @@ public class ThreadSafeHeap<T> where T: ThreadSafeHeapNode, T: Comparable<T> {
             null
     }
 
-    public fun addLast(node: T) = synchronized(this) {
+    impl public fun addLast(node: T) = synchronized(this) {
         addImpl(node)
     }
 
-    public fun addLastIf(node: T, cond: () -> Boolean): Boolean = synchronized(this) {
+    impl public fun addLastIf(node: T, cond: () -> Boolean): Boolean = synchronized(this) {
         if (cond()) {
             addImpl(node)
             true
@@ -67,7 +62,7 @@ public class ThreadSafeHeap<T> where T: ThreadSafeHeapNode, T: Comparable<T> {
             false
     }
 
-    public fun remove(node: T): Boolean = synchronized(this) {
+    impl public fun remove(node: T): Boolean = synchronized(this) {
         if (node.index < 0) {
             false
         } else {
@@ -77,10 +72,10 @@ public class ThreadSafeHeap<T> where T: ThreadSafeHeapNode, T: Comparable<T> {
     }
 
     @PublishedApi
-    internal fun firstImpl(): T? = a?.get(0)
+    impl internal fun firstImpl(): T? = a?.get(0)
 
     @PublishedApi
-    internal fun removeAtImpl(index: Int): T {
+    impl internal fun removeAtImpl(index: Int): T {
         check(size > 0)
         val a = this.a!!
         size--
@@ -103,7 +98,7 @@ public class ThreadSafeHeap<T> where T: ThreadSafeHeapNode, T: Comparable<T> {
     }
 
     @PublishedApi
-    internal fun addImpl(node: T) {
+    impl internal fun addImpl(node: T) {
         val a = realloc()
         var i = size++
         a[i] = node

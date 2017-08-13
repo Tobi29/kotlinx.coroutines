@@ -16,11 +16,6 @@
 
 package kotlinx.coroutines.experimental
 
-import kotlinx.coroutines.experimental.internal.LockFreeLinkedListNode
-import java.lang.Runnable
-import java.util.concurrent.TimeUnit
-import kotlin.coroutines.experimental.CoroutineContext
-
 /**
  * Implemented by [CoroutineDispatcher] implementations that have event loop inside and can
  * be asked to process next event from their event queue.
@@ -38,31 +33,4 @@ header public interface EventLoop {
      * * [Long.MAX_VALUE] -- no more events, or was invoked from the wrong thread.
      */
     public fun processNextEvent(): Long
-}
-
-header internal abstract class EventLoopBase: CoroutineDispatcher, Delay, EventLoop {
-    protected abstract val canComplete: Boolean
-    protected abstract val isCompleted: Boolean
-    protected abstract fun unpark()
-    protected abstract fun isCorrectThread(): Boolean
-
-    protected val isEmpty: Boolean
-
-    fun execute(block: Runnable)
-
-    override fun dispatch(context: CoroutineContext, block: Runnable)
-
-    override fun scheduleResumeAfterDelay(time: Long, unit: TimeUnit, continuation: CancellableContinuation<Unit>)
-
-    override fun invokeOnTimeout(time: Long, unit: TimeUnit, block: Runnable): DisposableHandle
-
-    override fun processNextEvent(): Long
-
-    internal fun enqueue(queuedTask: QueuedTask)
-
-    protected fun clearAll()
-
-    protected fun rescheduleAllDelayed()
-
-    header internal abstract class QueuedTask : LockFreeLinkedListNode, Runnable
 }
