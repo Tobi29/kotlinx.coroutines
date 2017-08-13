@@ -24,7 +24,7 @@ impl internal interface TimeSource {
     impl fun unTrackTask()
     impl fun registerTimeLoopThread()
     impl fun unregisterTimeLoopThread()
-    impl fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
+    fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
     fun unpark(thread: Thread)
 }
 

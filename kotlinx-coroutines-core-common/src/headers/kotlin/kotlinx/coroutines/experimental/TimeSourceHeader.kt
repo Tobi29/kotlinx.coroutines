@@ -8,7 +8,6 @@ header internal interface TimeSource {
     fun unTrackTask()
     fun registerTimeLoopThread()
     fun unregisterTimeLoopThread()
-    fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
 }
 
 header internal var timeSource: TimeSource
