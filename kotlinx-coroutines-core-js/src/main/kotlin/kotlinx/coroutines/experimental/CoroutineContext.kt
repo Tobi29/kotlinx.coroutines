@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2017 Tobi29
+ * Copyright 2016-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-include "kotlinx-coroutines-core-common"
-include "kotlinx-coroutines-core"
-include "kotlinx-coroutines-core-js"
+package kotlinx.coroutines.experimental
+
+import kotlin.coroutines.experimental.CoroutineContext
+
+// for tests only
+impl internal fun resetCoroutineId() {
+}
+
+impl public fun newCoroutineContext(context: CoroutineContext): CoroutineContext = context
+
+@PublishedApi
+impl internal fun updateContext(context: CoroutineContext): String? = null
+
+@PublishedApi
+impl internal fun restoreContext(oldName: String?) {
+}
