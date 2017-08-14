@@ -38,7 +38,7 @@ allprojects {
     } else {
         version = findProperty("build.version")
     }
-    group = "com.github.Tobi29.kotlinx.coroutines"
+    group = "com.github.Tobi29.kotlinx~coroutines"
 
     repositories {
         jcenter()
