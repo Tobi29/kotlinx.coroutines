@@ -16,7 +16,6 @@
 
 package kotlinx.coroutines.experimental
 
-import java.lang.Runnable
 import kotlin.coroutines.experimental.AbstractCoroutineContextElement
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.ContinuationInterceptor

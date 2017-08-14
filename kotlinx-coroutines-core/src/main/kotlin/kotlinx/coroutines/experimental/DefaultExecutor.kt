@@ -16,8 +16,6 @@
 
 package kotlinx.coroutines.experimental
 
-import java.util.concurrent.TimeUnit
-
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
 impl internal object DefaultExecutor : EventLoopBase(), Runnable {
 

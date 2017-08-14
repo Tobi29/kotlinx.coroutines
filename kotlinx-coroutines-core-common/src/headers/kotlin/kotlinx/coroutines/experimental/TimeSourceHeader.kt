@@ -1,7 +1,5 @@
 package kotlinx.coroutines.experimental
 
-import java.lang.Runnable
-
 header internal interface TimeSource {
     fun nanoTime(): Long
     fun trackTask(block: Runnable): Runnable

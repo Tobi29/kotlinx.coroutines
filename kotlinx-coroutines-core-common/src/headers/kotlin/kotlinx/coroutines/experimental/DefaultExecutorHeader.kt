@@ -1,7 +1,5 @@
 package kotlinx.coroutines.experimental
 
-import java.lang.Runnable
-
 header internal object DefaultExecutor : EventLoopBase, Runnable {
 
     override val canComplete: Boolean

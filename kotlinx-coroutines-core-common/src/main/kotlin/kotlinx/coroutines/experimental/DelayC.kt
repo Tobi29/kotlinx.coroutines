@@ -16,8 +16,6 @@
 
 package kotlinx.coroutines.experimental
 
-import java.lang.Runnable
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.experimental.ContinuationInterceptor
 import kotlin.coroutines.experimental.CoroutineContext
 

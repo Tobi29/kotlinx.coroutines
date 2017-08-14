@@ -24,7 +24,6 @@ import kotlinx.coroutines.experimental.channels.SendChannel
 import kotlinx.coroutines.experimental.internal.*
 import kotlinx.coroutines.experimental.intrinsics.startCoroutineUndispatched
 import kotlinx.coroutines.experimental.sync.Mutex
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.CoroutineContext

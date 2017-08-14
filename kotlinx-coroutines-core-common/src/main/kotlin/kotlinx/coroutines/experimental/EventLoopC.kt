@@ -20,8 +20,6 @@ import kotlinx.coroutines.experimental.internal.LockFreeLinkedListHead
 import kotlinx.coroutines.experimental.internal.LockFreeLinkedListNode
 import kotlinx.coroutines.experimental.internal.ThreadSafeHeap
 import kotlinx.coroutines.experimental.internal.ThreadSafeHeapNode
-import java.lang.Runnable
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.experimental.CoroutineContext
 
 private const val DELAYED = 0

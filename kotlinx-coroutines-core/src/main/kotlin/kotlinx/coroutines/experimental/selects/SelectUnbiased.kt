@@ -18,11 +18,11 @@ package kotlinx.coroutines.experimental.selects
 
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.TimeUnit
 import kotlinx.coroutines.experimental.channels.ReceiveChannel
 import kotlinx.coroutines.experimental.channels.SendChannel
 import kotlinx.coroutines.experimental.sync.Mutex
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.experimental.Continuation
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
