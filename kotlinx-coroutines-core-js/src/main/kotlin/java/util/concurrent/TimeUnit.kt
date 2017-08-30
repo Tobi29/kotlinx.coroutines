@@ -37,14 +37,14 @@ impl enum class TimeUnit(private val base: Long) {
     private fun scale(duration: Long,
                       base: Long,
                       destination: Long) =
-            if (destination > base) scaleUp(duration, base, destination)
-            else if (destination < base) scaleDown(duration, base, destination)
+            if (destination < base) scaleUp(duration, base, destination)
+            else if (destination > base) scaleDown(duration, base, destination)
             else duration
 
     private fun scaleUp(duration: Long,
                         base: Long,
                         destination: Long): Long {
-        val scale = destination / base
+        val scale = base / destination
         val max = Long.MAX_VALUE / scale
         return if (duration > max) Long.MAX_VALUE
         else if (duration < -max) Long.MIN_VALUE
@@ -54,7 +54,7 @@ impl enum class TimeUnit(private val base: Long) {
     private fun scaleDown(duration: Long,
                           base: Long,
                           destination: Long): Long {
-        val scale = base / destination
+        val scale = destination / base
         return duration / scale
     }
 }
