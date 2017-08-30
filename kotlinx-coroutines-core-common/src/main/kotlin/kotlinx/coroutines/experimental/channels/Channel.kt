@@ -23,7 +23,6 @@ import kotlinx.coroutines.experimental.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.experimental.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.experimental.selects.SelectBuilder
 import kotlinx.coroutines.experimental.selects.SelectInstance
-import kotlinx.coroutines.experimental.selects.select
 import kotlinx.coroutines.experimental.yield
 
 /**
@@ -289,23 +288,25 @@ public fun <E> Channel(): Channel<E> = RendezvousChannel<E>()
  * * otherwise -- throws [IllegalArgumentException].
  */
 public fun <E> Channel(capacity: Int): Channel<E> =
-    when (capacity) {
-        0 -> RendezvousChannel()
-        UNLIMITED -> LinkedListChannel()
-        CONFLATED -> ConflatedChannel()
-        else -> ArrayChannel(capacity)
-    }
+        when (capacity) {
+            0 -> RendezvousChannel()
+            UNLIMITED -> LinkedListChannel()
+            CONFLATED -> ConflatedChannel()
+            else -> ArrayChannel(capacity)
+        }
 
 /**
  * Indicates attempt to [send][SendChannel.send] on [isClosedForSend][SendChannel.isClosedForSend] channel
  * that was closed _normally_. A _failed_ channel rethrows the original [close][SendChannel.close] cause
  * exception on send attempts.
  */
-public class ClosedSendChannelException(message: String?) : CancellationException(message)
+// TODO: Properly support null
+public class ClosedSendChannelException(message: String?) : CancellationException(message ?: "")
 
 /**
  * Indicates attempt to [receive][ReceiveChannel.receive] on [isClosedForReceive][ReceiveChannel.isClosedForReceive]
  * channel that was closed _normally_. A _failed_ channel rethrows the original [close][SendChannel.close] cause
  * exception on receive attempts.
  */
-public class ClosedReceiveChannelException(message: String?) : NoSuchElementException(message)
+// TODO: Properly support null
+public class ClosedReceiveChannelException(message: String?) : NoSuchElementException(message ?: "")

@@ -30,63 +30,6 @@ import kotlin.coroutines.experimental.CoroutineContext
 import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
-/**
- * Scope for [select] invocation.
- */
-public interface SelectBuilder<in R> {
-    /**
-     * Clause for [Job.join] suspending function that selects the given [block] when the job is complete.
-     * This clause never fails, even if the job completes exceptionally.
-     */
-    public fun Job.onJoin(block: suspend () -> R)
-
-    /**
-     * Clause for [Deferred.await] suspending function that selects the given [block] with the deferred value is
-     * resolved. The [select] invocation fails if the deferred value completes exceptionally (either fails or
-     * it cancelled).
-     */
-    public fun <T> Deferred<T>.onAwait(block: suspend (T) -> R)
-
-    /**
-     * Clause for [SendChannel.send] suspending function that selects the given [block] when the [element] is sent to
-     * the channel. The [select] invocation fails with [ClosedSendChannelException] if the channel
-     * [isClosedForSend][SendChannel.isClosedForSend] _normally_ or with the original
-     * [close][SendChannel.close] cause exception if the channel has _failed_.
-     */
-    public fun <E> SendChannel<E>.onSend(element: E, block: suspend () -> R)
-
-    /**
-     * Clause for [ReceiveChannel.receive] suspending function that selects the given [block] with the element that
-     * is received from the channel. The [select] invocation fails with [ClosedReceiveChannelException] if the channel
-     * [isClosedForReceive][ReceiveChannel.isClosedForReceive] _normally_ or with the original
-     * [close][SendChannel.close] cause exception if the channel has _failed_.
-     */
-    public fun <E> ReceiveChannel<E>.onReceive(block: suspend (E) -> R)
-
-    /**
-     * Clause for [ReceiveChannel.receiveOrNull] suspending function that selects the given [block] with the element that
-     * is received from the channel or selects the given [block] with `null` if if the channel
-     * [isClosedForReceive][ReceiveChannel.isClosedForReceive] _normally_. The [select] invocation fails with
-     * the original [close][SendChannel.close] cause exception if the channel has _failed_.
-     */
-    public fun <E> ReceiveChannel<E>.onReceiveOrNull(block: suspend (E?) -> R)
-
-    /**
-     * Clause for [Mutex.lock] suspending function that selects the given [block] when the mutex is locked.
-     *
-     * @param owner Optional owner token for debugging. When `owner` is specified (non-null value) and this mutex
-     *        is already locked with the same token (same identity), this clause throws [IllegalStateException].
-     */
-    public fun Mutex.onLock(owner: Any? = null, block: suspend () -> R)
-
-    /**
-     * Clause that selects the given [block] after a specified timeout passes.
-     *
-     * @param time timeout time
-     * @param unit timeout unit (milliseconds by default)
-     */
-    public fun onTimeout(time: Long, unit: TimeUnit = TimeUnit.MILLISECONDS, block: suspend () -> R)
-}
 
 /**
  * Waits for the result of multiple suspending functions simultaneously, which are specified using _clauses_
@@ -140,8 +83,6 @@ public inline suspend fun <R> select(crossinline builder: SelectBuilder<R>.() ->
         scope.getResult()
     }
 
-
-internal val ALREADY_SELECTED: Any = Symbol("ALREADY_SELECTED")
 private val UNDECIDED: Any = Symbol("UNDECIDED")
 private val RESUMED: Any = Symbol("RESUMED")
 
@@ -381,9 +322,12 @@ internal class SelectBuilderImpl<in R>(
         registerSelectReceiveOrNull(this@SelectBuilderImpl, block)
     }
 
+    /*
+    TODO:
     override fun Mutex.onLock(owner: Any?, block: suspend () -> R) {
         registerSelectLock(this@SelectBuilderImpl, owner, block)
     }
+    */
 
     override fun onTimeout(time: Long, unit: TimeUnit, block: suspend () -> R) {
         require(time >= 0) { "Timeout time $time cannot be negative" }

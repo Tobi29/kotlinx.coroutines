@@ -30,11 +30,11 @@ import kotlin.concurrent.withLock
  * This implementation uses lock to protect the buffer, which is held only during very short buffer-update operations.
  * The lists of suspended senders or receivers are lock-free.
  */
-public open class ArrayChannel<E>(
-    /**
-     * Buffer capacity.
-     */
-    val capacity: Int
+impl public open class ArrayChannel<E>(
+        /**
+         * Buffer capacity.
+         */
+        impl val capacity: Int
 ) : AbstractChannel<E>() {
     init {
         require(capacity >= 1) { "ArrayChannel capacity must be at least 1, but $capacity was specified" }
@@ -46,13 +46,13 @@ public open class ArrayChannel<E>(
     @Volatile
     private var size: Int = 0
 
-    protected final override val isBufferAlwaysEmpty: Boolean get() = false
-    protected final override val isBufferEmpty: Boolean get() = size == 0
-    protected final override val isBufferAlwaysFull: Boolean get() = false
-    protected final override val isBufferFull: Boolean get() = size == capacity
+    impl protected final override val isBufferAlwaysEmpty: Boolean get() = false
+    impl protected final override val isBufferEmpty: Boolean get() = size == 0
+    impl protected final override val isBufferAlwaysFull: Boolean get() = false
+    impl protected final override val isBufferFull: Boolean get() = size == capacity
 
     // result is `OFFER_SUCCESS | OFFER_FAILED | Closed`
-    protected override fun offerInternal(element: E): Any {
+    impl protected override fun offerInternal(element: E): Any {
         var receive: ReceiveOrClosed<E>? = null
         var token: Any? = null
         lock.withLock {
@@ -88,7 +88,7 @@ public open class ArrayChannel<E>(
     }
 
     // result is `ALREADY_SELECTED | OFFER_SUCCESS | OFFER_FAILED | Closed`
-    protected override fun offerSelectInternal(element: E, select: SelectInstance<*>): Any {
+    impl protected override fun offerSelectInternal(element: E, select: SelectInstance<*>): Any {
         var receive: ReceiveOrClosed<E>? = null
         var token: Any? = null
         lock.withLock {
@@ -136,7 +136,7 @@ public open class ArrayChannel<E>(
     }
 
     // result is `E | POLL_FAILED | Closed`
-    protected override fun pollInternal(): Any? {
+    impl protected override fun pollInternal(): Any? {
         var send: Send? = null
         var token: Any? = null
         var result: Any? = null
@@ -172,7 +172,7 @@ public open class ArrayChannel<E>(
     }
 
     // result is `ALREADY_SELECTED | E | POLL_FAILED | Closed`
-    protected override fun pollSelectInternal(select: SelectInstance<*>): Any? {
+    impl protected override fun pollSelectInternal(select: SelectInstance<*>): Any? {
         var send: Send? = null
         var token: Any? = null
         var result: Any? = null

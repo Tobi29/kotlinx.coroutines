@@ -89,9 +89,12 @@ internal class UnbiasedSelectBuilderImpl<in R>(cont: Continuation<R>) : SelectBu
         clauses += { registerSelectReceiveOrNull(instance, block) }
     }
 
+    /*
+    TODO:
     override fun Mutex.onLock(owner: Any?, block: suspend () -> R) {
         clauses += { registerSelectLock(instance, owner, block) }
     }
+    */
 
     override fun onTimeout(time: Long, unit: TimeUnit, block: suspend () -> R) {
         clauses += { instance.onTimeout(time, unit, block) }
