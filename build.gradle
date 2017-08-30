@@ -15,7 +15,7 @@
  */
 
 buildscript {
-    def kotlinVersion = "1.1.4-eap-76"
+    def kotlinVersion = "1.1.4-2"
     def dokkaVersion = "0.9.14"
 
     repositories {
@@ -61,13 +61,13 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "4.0.2"
+    gradleVersion = "4.1"
     distributionUrl =
             "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
 
 ext {
-    kotlinVersion = "1.1.4-eap-76"
+    kotlinVersion = "1.1.4-2"
 
     kotlinSTD = "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
     kotlinSTDJVM = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
