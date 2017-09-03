@@ -16,62 +16,44 @@
 
 package kotlinx.coroutines.experimental.sync
 
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CancellableContinuation
+import kotlinx.coroutines.experimental.DisposableHandle
 import kotlinx.coroutines.experimental.internal.*
 import kotlinx.coroutines.experimental.intrinsics.startCoroutineUndispatched
+import kotlinx.coroutines.experimental.removeOnCancel
 import kotlinx.coroutines.experimental.selects.ALREADY_SELECTED
 import kotlinx.coroutines.experimental.selects.SelectInstance
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+import kotlinx.coroutines.experimental.suspendAtomicCancellableCoroutine
 import kotlin.coroutines.experimental.startCoroutine
 
 impl internal fun MutexNewImpl(locked: Boolean): Mutex = MutexImpl(locked)
 
 internal class MutexImpl(locked: Boolean) : Mutex {
     // State is: Empty | LockedQueue | OpDescriptor
-    @Volatile
     private var _state: Any? = if (locked) EmptyLocked else EmptyUnlocked // shared objects while we have no waiters
 
     // resumeNext is: RESUME_QUIESCENT | RESUME_ACTIVE | ResumeReq
-    @Volatile
     private var resumeNext: Any = RESUME_QUIESCENT
 
     private companion object {
-        @JvmField
-        val STATE: AtomicReferenceFieldUpdater<MutexImpl, Any?> =
-                AtomicReferenceFieldUpdater.newUpdater(MutexImpl::class.java, Any::class.java, "_state")
-
-        @JvmField
-        val RESUME_NEXT: AtomicReferenceFieldUpdater<MutexImpl, Any> =
-                AtomicReferenceFieldUpdater.newUpdater(MutexImpl::class.java, Any::class.java, "resumeNext")
-
-        @JvmField
         val LOCK_FAIL = Symbol("LOCK_FAIL")
 
-        @JvmField
         val ENQUEUE_FAIL = Symbol("ENQUEUE_FAIL")
 
-        @JvmField
         val UNLOCK_FAIL = Symbol("UNLOCK_FAIL")
 
-        @JvmField
         val SELECT_SUCCESS = Symbol("SELECT_SUCCESS")
 
-        @JvmField
         val LOCKED = Symbol("LOCKED")
 
-        @JvmField
         val UNLOCKED = Symbol("UNLOCKED")
 
-        @JvmField
         val EmptyLocked = Empty(LOCKED)
 
-        @JvmField
         val EmptyUnlocked = Empty(UNLOCKED)
 
-        @JvmField
         val RESUME_QUIESCENT = Symbol("RESUME_QUIESCENT")
 
-        @JvmField
         val RESUME_ACTIVE = Symbol("RESUME_ACTIVE")
     }
 
@@ -102,7 +84,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
                 is Empty -> {
                     if (state.locked !== UNLOCKED) return false
                     val update = if (owner == null) EmptyLocked else Empty(owner)
-                    if (STATE.compareAndSet(this, state, update)) return true
+                    if (_state === state) {
+                        _state = update
+                        return true
+                    }
                 }
                 is LockedQueue -> {
                     check(state.owner !== owner) { "Already locked by $owner" }
@@ -128,11 +113,14 @@ internal class MutexImpl(locked: Boolean) : Mutex {
             when (state) {
                 is Empty -> {
                     if (state.locked !== UNLOCKED) {  // try upgrade to queue & retry
-                        STATE.compareAndSet(this, state, LockedQueue(state.locked))
+                        if (_state === state) { // locked
+                            _state = LockedQueue(state.locked)
+                        }
                     } else {
                         // try lock
                         val update = if (owner == null) EmptyLocked else Empty(owner)
-                        if (STATE.compareAndSet(this, state, update)) { // locked
+                        if (_state === state) { // locked
+                            _state = update
                             cont.resume(Unit)
                             return@sc
                         }
@@ -161,7 +149,9 @@ internal class MutexImpl(locked: Boolean) : Mutex {
             when (state) {
                 is Empty -> {
                     if (state.locked !== UNLOCKED) { // try upgrade to queue & retry
-                        STATE.compareAndSet(this, state, LockedQueue(state.locked))
+                        if (_state === state) {
+                            _state = LockedQueue(state.locked)
+                        }
                     } else {
                         // try lock
                         val failure = select.performAtomicTrySelect(TryLockDesc(this, owner))
@@ -199,21 +189,28 @@ internal class MutexImpl(locked: Boolean) : Mutex {
     }
 
     private class TryLockDesc(
-            @JvmField val mutex: MutexImpl,
-            @JvmField val owner: Any?
+            val mutex: MutexImpl,
+            val owner: Any?
     ) : AtomicDesc() {
         // This is Harris's RDCSS (Restricted Double-Compare Single Swap) operation
         private inner class PrepareOp(private val op: AtomicOp<*>) : OpDescriptor() {
             override fun perform(affected: Any?): Any? {
                 val update: Any = if (op.isDecided) EmptyUnlocked else op // restore if was already decided
-                STATE.compareAndSet(affected as MutexImpl, this, update)
+                affected as MutexImpl
+                if (affected._state === this) {
+                    affected._state = update
+                }
                 return null // ok
             }
         }
 
         override fun prepare(op: AtomicOp<*>): Any? {
             val prepare = PrepareOp(op)
-            if (!STATE.compareAndSet(mutex, EmptyUnlocked, prepare)) return LOCK_FAIL
+            if (mutex._state === EmptyUnlocked) {
+                mutex._state = prepare
+            } else {
+                return LOCK_FAIL
+            }
             return prepare.perform(mutex)
         }
 
@@ -221,12 +218,14 @@ internal class MutexImpl(locked: Boolean) : Mutex {
             val update = if (failure != null) EmptyUnlocked else {
                 if (owner == null) EmptyLocked else Empty(owner)
             }
-            STATE.compareAndSet(mutex, op, update)
+            if (mutex._state == op) {
+                mutex._state = update
+            }
         }
     }
 
     private class TryEnqueueLockDesc<R>(
-            @JvmField val mutex: MutexImpl,
+            val mutex: MutexImpl,
             owner: Any?,
             queue: LockedQueue,
             select: SelectInstance<R>,
@@ -247,7 +246,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
                         check(state.locked !== UNLOCKED) { "Mutex is not locked" }
                     else
                         check(state.locked === owner) { "Mutex is locked by ${state.locked} but expected $owner" }
-                    if (STATE.compareAndSet(this, state, EmptyUnlocked)) return
+                    if (_state === state) {
+                        _state = EmptyUnlocked
+                        return
+                    }
                 }
                 is OpDescriptor -> state.perform(this)
                 is LockedQueue -> {
@@ -256,7 +258,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
                     val waiter = state.removeFirstOrNull()
                     if (waiter == null) {
                         val op = UnlockOp(state)
-                        if (STATE.compareAndSet(this, state, op) && op.perform(this) == null) return
+                        if (_state === state) {
+                            _state = op
+                            if (op.perform(this) == null) return
+                        }
                     } else {
                         val token = (waiter as LockWaiter).tryResumeLockWaiter()
                         if (token != null) {
@@ -280,8 +285,8 @@ internal class MutexImpl(locked: Boolean) : Mutex {
     }
 
     private class ResumeReq(
-            @JvmField val waiter: LockWaiter,
-            @JvmField val token: Any
+            val waiter: LockWaiter,
+            val token: Any
     )
 
     private fun startResumeNext(waiter: LockWaiter, token: Any): Boolean {
@@ -295,7 +300,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
                     return true
                 }
                 resumeNext === RESUME_ACTIVE ->
-                    if (RESUME_NEXT.compareAndSet(this, resumeNext, ResumeReq(waiter, token))) return false
+                    if (this.resumeNext === resumeNext) {
+                        this.resumeNext = ResumeReq(waiter, token)
+                        return false
+                    }
                 else -> error("Cannot happen")
             }
         }
@@ -306,7 +314,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
             val resumeNext = this.resumeNext
             when {
                 resumeNext === RESUME_ACTIVE ->
-                    if (RESUME_NEXT.compareAndSet(this, resumeNext, RESUME_QUIESCENT)) return
+                    if (this.resumeNext === resumeNext) {
+                        this.resumeNext = RESUME_QUIESCENT
+                        return
+                    }
                 resumeNext is ResumeReq -> {
                     // this is never concurrently, only one thread is finishing, so no need to CAS here
                     this.resumeNext = RESUME_ACTIVE
@@ -330,19 +341,19 @@ internal class MutexImpl(locked: Boolean) : Mutex {
     }
 
     private class Empty(
-            @JvmField val locked: Any
+            val locked: Any
     ) {
         override fun toString(): String = "Empty[$locked]"
     }
 
     private class LockedQueue(
-            @JvmField var owner: Any
+            var owner: Any
     ) : LockFreeLinkedListHead() {
         override fun toString(): String = "LockedQueue[$owner]"
     }
 
     private abstract class LockWaiter(
-            @JvmField val owner: Any?
+            val owner: Any?
     ) : LockFreeLinkedListNode(), DisposableHandle {
         final override fun dispose() {
             remove()
@@ -354,7 +365,7 @@ internal class MutexImpl(locked: Boolean) : Mutex {
 
     private class LockCont(
             owner: Any?,
-            @JvmField val cont: CancellableContinuation<Unit>
+            val cont: CancellableContinuation<Unit>
     ) : LockWaiter(owner) {
         override fun tryResumeLockWaiter() = cont.tryResume(Unit)
         override fun completeResumeLockWaiter(token: Any) = cont.completeResume(token)
@@ -363,8 +374,8 @@ internal class MutexImpl(locked: Boolean) : Mutex {
 
     private class LockSelect<R>(
             owner: Any?,
-            @JvmField val select: SelectInstance<R>,
-            @JvmField val block: suspend () -> R
+            val select: SelectInstance<R>,
+            val block: suspend () -> R
     ) : LockWaiter(owner) {
         override fun tryResumeLockWaiter(): Any? = if (select.trySelect(null)) SELECT_SUCCESS else null
         override fun completeResumeLockWaiter(token: Any) {
@@ -377,7 +388,7 @@ internal class MutexImpl(locked: Boolean) : Mutex {
 
     // atomic unlock operation that checks that waiters queue is empty
     private class UnlockOp(
-            @JvmField val queue: LockedQueue
+            val queue: LockedQueue
     ) : OpDescriptor() {
         override fun perform(affected: Any?): Any? {
             /*
@@ -388,7 +399,10 @@ internal class MutexImpl(locked: Boolean) : Mutex {
              */
             val success = queue.isEmpty
             val update: Any = if (success) EmptyUnlocked else queue
-            STATE.compareAndSet(affected as MutexImpl, this@UnlockOp, update)
+            affected as MutexImpl
+            if (affected._state === this@UnlockOp) {
+                affected._state = update
+            }
             /*
                 `perform` invocation from the original `unlock` invocation may be coming too late, when
                 some other thread had already helped to complete it (either successfully or not).

@@ -322,12 +322,9 @@ internal class SelectBuilderImpl<in R>(
         registerSelectReceiveOrNull(this@SelectBuilderImpl, block)
     }
 
-    /*
-    TODO:
     override fun Mutex.onLock(owner: Any?, block: suspend () -> R) {
         registerSelectLock(this@SelectBuilderImpl, owner, block)
     }
-    */
 
     override fun onTimeout(time: Long, unit: TimeUnit, block: suspend () -> R) {
         require(time >= 0) { "Timeout time $time cannot be negative" }

@@ -26,6 +26,7 @@ import kotlinx.coroutines.experimental.channels.ReceiveChannel
 import kotlinx.coroutines.experimental.channels.SendChannel
 import kotlinx.coroutines.experimental.internal.AtomicDesc
 import kotlinx.coroutines.experimental.internal.Symbol
+import kotlinx.coroutines.experimental.sync.Mutex
 import kotlin.coroutines.experimental.Continuation
 
 /**
@@ -111,8 +112,6 @@ public interface SelectBuilder<in R> {
      */
     public fun <E> ReceiveChannel<E>.onReceiveOrNull(block: suspend (E?) -> R)
 
-    /*
-    TODO:
     /**
      * Clause for [Mutex.lock] suspending function that selects the given [block] when the mutex is locked.
      *
@@ -120,7 +119,6 @@ public interface SelectBuilder<in R> {
      *        is already locked with the same token (same identity), this clause throws [IllegalStateException].
      */
     public fun Mutex.onLock(owner: Any? = null, block: suspend () -> R)
-    */
 
     /**
      * Clause that selects the given [block] after a specified timeout passes.
