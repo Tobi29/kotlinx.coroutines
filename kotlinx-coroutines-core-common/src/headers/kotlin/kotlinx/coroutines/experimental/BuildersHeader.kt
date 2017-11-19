@@ -18,19 +18,19 @@ package kotlinx.coroutines.experimental
 
 import kotlin.coroutines.experimental.CoroutineContext
 
-header internal fun launchImpl(
+internal expect fun launchImpl(
         context: CoroutineContext,
         start: CoroutineStart,
         block: suspend CoroutineScope.() -> Unit
 ): Job
 
-header internal suspend fun <T> runImpl(
+internal expect suspend fun <T> runImpl(
         context: CoroutineContext,
         start: CoroutineStart,
         block: suspend () -> T
 ): T
 
-header internal fun <T> runBlockingImpl(
+internal expect fun <T> runBlockingImpl(
         context: CoroutineContext,
         block: suspend CoroutineScope.() -> T
 ): T

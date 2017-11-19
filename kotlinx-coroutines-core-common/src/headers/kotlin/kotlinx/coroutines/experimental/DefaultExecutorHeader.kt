@@ -1,6 +1,6 @@
 package kotlinx.coroutines.experimental
 
-header internal object DefaultExecutor : EventLoopBase, Runnable {
+internal expect object DefaultExecutor : EventLoopBase, Runnable {
 
     override val canComplete: Boolean
     override val isCompleted: Boolean

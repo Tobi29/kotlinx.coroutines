@@ -39,15 +39,15 @@ private val DEBUG = run {
 private val COROUTINE_ID = AtomicLong()
 
 // for tests only
-impl internal fun resetCoroutineId() {
+internal actual fun resetCoroutineId() {
     COROUTINE_ID.set(0)
 }
 
-impl public fun newCoroutineContext(context: CoroutineContext): CoroutineContext =
+public actual fun newCoroutineContext(context: CoroutineContext): CoroutineContext =
         if (DEBUG) context + CoroutineId(COROUTINE_ID.incrementAndGet()) else context
 
 @PublishedApi
-impl internal fun updateContext(context: CoroutineContext): String? {
+internal actual fun updateContext(context: CoroutineContext): String? {
     if (!DEBUG) return null
     val newId = context[CoroutineId] ?: return null
     val currentThread = Thread.currentThread()
@@ -64,6 +64,6 @@ impl internal fun updateContext(context: CoroutineContext): String? {
 }
 
 @PublishedApi
-impl internal fun restoreContext(oldName: String?) {
+internal actual fun restoreContext(oldName: String?) {
     if (oldName != null) Thread.currentThread().name = oldName
 }

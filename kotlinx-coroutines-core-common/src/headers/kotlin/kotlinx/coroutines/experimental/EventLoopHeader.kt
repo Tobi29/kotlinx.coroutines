@@ -23,7 +23,7 @@ package kotlinx.coroutines.experimental
  * It may optionally implement [Delay] interface and support time-scheduled tasks. It is used by [runBlocking] to
  * continue processing events when invoked from the event dispatch thread.
  */
-header public interface EventLoop {
+public expect interface EventLoop {
     /**
      * Processes next event in this event loop.
      *

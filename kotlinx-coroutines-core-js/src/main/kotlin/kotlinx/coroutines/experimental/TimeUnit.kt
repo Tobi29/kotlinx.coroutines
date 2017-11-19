@@ -1,6 +1,6 @@
 package kotlinx.coroutines.experimental
 
-impl enum class TimeUnit(private val base: Long) {
+actual enum class TimeUnit(private val base: Long) {
     NANOSECONDS(1L),
     MICROSECONDS(1000L),
     MILLISECONDS(1000L * 1000L),
@@ -9,29 +9,29 @@ impl enum class TimeUnit(private val base: Long) {
     HOURS(1000L * 1000L * 1000L * 60L * 60L),
     DAYS(1000L * 1000L * 1000L * 60L * 60L * 24L);
 
-    impl open fun convert(sourceDuration: Long,
-                          sourceUnit: TimeUnit) =
+    actual open fun convert(sourceDuration: Long,
+                            sourceUnit: TimeUnit) =
             scale(sourceDuration, sourceUnit.base, base)
 
-    impl open fun toNanos(duration: Long) =
+    actual open fun toNanos(duration: Long) =
             scale(duration, base, NANOSECONDS.base)
 
-    impl open fun toMicros(duration: Long) =
+    actual open fun toMicros(duration: Long) =
             scale(duration, base, MICROSECONDS.base)
 
-    impl open fun toMillis(duration: Long) =
+    actual open fun toMillis(duration: Long) =
             scale(duration, base, MILLISECONDS.base)
 
-    impl open fun toSeconds(duration: Long) =
+    actual open fun toSeconds(duration: Long) =
             scale(duration, base, SECONDS.base)
 
-    impl open fun toMinutes(duration: Long) =
+    actual open fun toMinutes(duration: Long) =
             scale(duration, base, MINUTES.base)
 
-    impl open fun toHours(duration: Long) =
+    actual open fun toHours(duration: Long) =
             scale(duration, base, HOURS.base)
 
-    impl open fun toDays(duration: Long) =
+    actual open fun toDays(duration: Long) =
             scale(duration, base, DAYS.base)
 
     private fun scale(duration: Long,

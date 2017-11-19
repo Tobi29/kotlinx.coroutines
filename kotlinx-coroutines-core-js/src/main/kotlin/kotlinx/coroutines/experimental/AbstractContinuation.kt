@@ -21,9 +21,9 @@ import kotlin.coroutines.experimental.Continuation
 /**
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl internal abstract class AbstractContinuation<in T> actual constructor(
+internal actual abstract class AbstractContinuation<in T> actual constructor(
         active: Boolean,
-        impl protected val resumeMode: Int
+        protected actual val resumeMode: Int
 ) : JobSupport(active), Continuation<T> {
     private var decision = UNDECIDED
 
@@ -42,13 +42,13 @@ impl internal abstract class AbstractContinuation<in T> actual constructor(
         Note: both tryResume and trySuspend can be invoked at most once, first invocation wins
      */
 
-    impl protected companion object {
-        impl val UNDECIDED = 0
-        impl val SUSPENDED = 1
-        impl val RESUMED = 2
+    protected actual companion object {
+        actual val UNDECIDED = 0
+        actual val SUSPENDED = 1
+        actual val RESUMED = 2
     }
 
-    impl protected fun trySuspend(): Boolean {
+    protected actual fun trySuspend(): Boolean {
         while (true) { // lock-free loop on decision
             val decision = this.decision // volatile read
             when (decision) {
@@ -62,7 +62,7 @@ impl internal abstract class AbstractContinuation<in T> actual constructor(
         }
     }
 
-    impl protected fun tryResume(): Boolean {
+    protected actual fun tryResume(): Boolean {
         while (true) { // lock-free loop on decision
             val decision = this.decision // volatile read
             when (decision) {
@@ -76,9 +76,9 @@ impl internal abstract class AbstractContinuation<in T> actual constructor(
         }
     }
 
-    impl override fun resume(value: T) = resumeImpl(value, resumeMode)
+    actual override fun resume(value: T) = resumeImpl(value, resumeMode)
 
-    impl protected fun resumeImpl(value: T, resumeMode: Int) {
+    protected actual fun resumeImpl(value: T, resumeMode: Int) {
         lockFreeLoopOnState { state ->
             when (state) {
                 is Incomplete -> if (updateState(state, value, resumeMode)) return
@@ -88,9 +88,9 @@ impl internal abstract class AbstractContinuation<in T> actual constructor(
         }
     }
 
-    impl override fun resumeWithException(exception: Throwable) = resumeWithExceptionImpl(exception, resumeMode)
+    actual override fun resumeWithException(exception: Throwable) = resumeWithExceptionImpl(exception, resumeMode)
 
-    impl protected fun resumeWithExceptionImpl(exception: Throwable, resumeMode: Int) {
+    protected actual fun resumeWithExceptionImpl(exception: Throwable, resumeMode: Int) {
         lockFreeLoopOnState { state ->
             when (state) {
                 is Incomplete -> {
@@ -106,7 +106,7 @@ impl internal abstract class AbstractContinuation<in T> actual constructor(
         }
     }
 
-    impl override fun handleException(exception: Throwable) {
+    actual override fun handleException(exception: Throwable) {
         handleCoroutineException(context, exception)
     }
 }

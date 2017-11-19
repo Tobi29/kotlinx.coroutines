@@ -50,7 +50,7 @@ public fun Job.cancelFutureOnCompletion(future: Future<*>): DisposableHandle =
  * @param active when `true` the job is created in _active_ state, when `false` in _new_ state. See [Job] for details.
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl public open class JobSupport actual constructor(active: Boolean) : AbstractCoroutineContextElement(Job), Job {
+public actual open class JobSupport actual constructor(active: Boolean) : AbstractCoroutineContextElement(Job), Job {
     /*
        === Internal states ===
 
@@ -110,11 +110,11 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     @Volatile
     private var parentHandle: DisposableHandle? = null
 
-    impl protected companion object {
+    protected actual companion object {
         private val STATE: AtomicReferenceFieldUpdater<JobSupport, Any?> =
                 AtomicReferenceFieldUpdater.newUpdater(JobSupport::class.java, Any::class.java, "_state")
 
-        impl fun stateToString(state: Any?): String =
+        actual fun stateToString(state: Any?): String =
                 if (state is Incomplete)
                     if (state.isActive) "Active" else "New"
                 else "Completed"
@@ -126,7 +126,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * Initializes parent job.
      * It shall be invoked at most once after construction after all other initialization.
      */
-    impl public fun initParentJob(parent: Job?) {
+    public actual fun initParentJob(parent: Job?) {
         check(parentHandle == null)
         if (parent == null) {
             parentHandle = NonDisposableHandle
@@ -152,7 +152,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * Invoked at most once on parent completion.
      * @suppress **This is unstable API and it is subject to change.**
      */
-    impl protected open fun onParentCancellation(cause: Throwable?) {
+    protected actual open fun onParentCancellation(cause: Throwable?) {
         // if parent was completed with CancellationException then use it as the cause of our cancellation, too.
         // however, we shall not use application specific exceptions here. So if parent crashes due to IOException,
         // we cannot and should not cancel the child with IOException
@@ -164,7 +164,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Returns current state of this job.
      */
-    impl protected val state: Any?
+    protected actual val state: Any?
         get() {
             while (true) { // helper loop on state (complete in-progress atomic operations)
                 val state = _state
@@ -173,21 +173,21 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
             }
         }
 
-    impl protected inline fun lockFreeLoopOnState(block: (Any?) -> Unit): Nothing {
+    protected actual inline fun lockFreeLoopOnState(block: (Any?) -> Unit): Nothing {
         while (true) {
             block(state)
         }
     }
 
-    impl public final override val isActive: Boolean
+    public actual final override val isActive: Boolean
         get() {
             val state = this.state
             return state is Incomplete && state.isActive
         }
 
-    impl public final override val isCompleted: Boolean get() = state !is Incomplete
+    public actual final override val isCompleted: Boolean get() = state !is Incomplete
 
-    impl public final override val isCancelled: Boolean
+    public actual final override val isCancelled: Boolean
         get() {
             val state = this.state
             return state is Cancelled || state is Cancelling
@@ -198,7 +198,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Updates current [state] of this job.
      */
-    impl protected fun updateState(expect: Any, proposedUpdate: Any?, mode: Int): Boolean {
+    protected actual fun updateState(expect: Any, proposedUpdate: Any?, mode: Int): Boolean {
         val update = coerceProposedUpdate(expect, proposedUpdate)
         if (!tryUpdateState(expect, update)) return false
         completeUpdateState(expect, update, mode)
@@ -223,7 +223,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Tries to initiate update of the current [state] of this job.
      */
-    impl protected fun tryUpdateState(expect: Any, update: Any?): Boolean {
+    protected actual fun tryUpdateState(expect: Any, update: Any?): Boolean {
         require(expect is Incomplete && update !is Incomplete) // only incomplete -> completed transition is allowed
         if (!STATE.compareAndSet(this, expect, update)) return false
         // Unregister from parent job
@@ -234,7 +234,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Completes update of the current [state] of this job.
      */
-    impl protected fun completeUpdateState(expect: Any, update: Any?, mode: Int) {
+    protected actual fun completeUpdateState(expect: Any, update: Any?, mode: Int) {
         // Invoke completion handlers
         val cause = (update as? CompletedExceptionally)?.cause
         when (expect) {
@@ -272,7 +272,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     private fun notifyCancellation(list: NodeList, cause: Throwable?) =
             notifyHandlers<JobCancellationNode<*>>(list, cause)
 
-    impl public final override fun start(): Boolean {
+    public actual final override fun start(): Boolean {
         lockFreeLoopOnState { state ->
             when (startInternal(state)) {
                 FALSE -> return false
@@ -306,9 +306,9 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Override to provide the actual [start] action.
      */
-    impl protected open fun onStart() {}
+    protected actual open fun onStart() {}
 
-    impl public final override fun getCompletionException(): Throwable {
+    public actual final override fun getCompletionException(): Throwable {
         val state = this.state
         return when (state) {
             is Cancelling -> state.cancelled.exception
@@ -325,7 +325,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * [IllegalStateException] when invoked for an job that has not [completed][isCompleted] nor
      * [isCancelled] yet.
      */
-    impl protected fun getCompletionCause(): Throwable? {
+    protected actual fun getCompletionCause(): Throwable? {
         val state = this.state
         return when (state) {
             is Cancelling -> state.cancelled.cause
@@ -335,10 +335,10 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         }
     }
 
-    impl public final override fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle =
+    public actual final override fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle =
             installHandler(handler, onCancelling = false)
 
-    impl public final override fun invokeOnCompletion(handler: CompletionHandler, onCancelling: Boolean): DisposableHandle =
+    public actual final override fun invokeOnCompletion(handler: CompletionHandler, onCancelling: Boolean): DisposableHandle =
             installHandler(handler, onCancelling = onCancelling && hasCancellingState)
 
     private fun installHandler(handler: CompletionHandler, onCancelling: Boolean): DisposableHandle {
@@ -402,7 +402,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         STATE.compareAndSet(this, state, list)
     }
 
-    impl final override suspend fun join() {
+    actual final override suspend fun join() {
         if (!joinInternal()) return // fast-path no wait
         return joinSuspend() // slow-path wait
     }
@@ -418,7 +418,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         cont.disposeOnCompletion(invokeOnCompletion(ResumeOnCompletion(this, cont)))
     }
 
-    impl override fun <R> registerSelectJoin(select: SelectInstance<R>, block: suspend () -> R) {
+    actual override fun <R> registerSelectJoin(select: SelectInstance<R>, block: suspend () -> R) {
         // fast-path -- check state and select/return if needed
         lockFreeLoopOnState { state ->
             if (select.isSelected) return
@@ -436,7 +436,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         }
     }
 
-    impl internal fun removeNode(node: JobNode<*>) {
+    internal actual fun removeNode(node: JobNode<*>) {
         // remove logic depends on the state of the job
         lockFreeLoopOnState { state ->
             when (state) {
@@ -455,9 +455,9 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         }
     }
 
-    impl protected open val hasCancellingState: Boolean get() = false
+    protected actual open val hasCancellingState: Boolean get() = false
 
-    impl public final override fun cancel(cause: Throwable?): Boolean =
+    public actual final override fun cancel(cause: Throwable?): Boolean =
             if (hasCancellingState)
                 makeCancelling(cause) else
                 makeCancelled(cause)
@@ -516,7 +516,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * Override to process any exceptions that were encountered while invoking completion handlers
      * installed via [invokeOnCompletion].
      */
-    impl protected open fun handleException(exception: Throwable) {
+    protected actual open fun handleException(exception: Throwable) {
         throw exception
     }
 
@@ -524,13 +524,13 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * It is invoked once when job is cancelled or is completed, similarly to [invokeOnCompletion] with
      * `onCancelling` set to `true`.
      */
-    impl protected open fun onCancellation() {}
+    protected actual open fun onCancellation() {}
 
     /**
      * Override for post-completion actions that need to do something with the state.
      * @param mode completion mode.
      */
-    impl protected open fun afterCompletion(state: Any?, mode: Int) {}
+    protected actual open fun afterCompletion(state: Any?, mode: Int) {}
 
     // for nicer debugging
     override fun toString(): String {
@@ -542,8 +542,8 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * Interface for incomplete [state] of a job.
      */
-    impl public interface Incomplete {
-        impl val isActive: Boolean
+    public actual interface Incomplete {
+        actual val isActive: Boolean
     }
 
     private class Cancelling(
@@ -587,8 +587,8 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * @param cause the exceptional completion cause. If `cause` is null, then a [CancellationException]
      *        if created on first get from [exception] property.
      */
-    impl public open class CompletedExceptionally actual constructor(
-            @JvmField impl val cause: Throwable?
+    public actual open class CompletedExceptionally actual constructor(
+            @JvmField actual val cause: Throwable?
     ) {
         @Volatile
         private var _exception: Throwable? = cause // materialize CancellationException on first need
@@ -596,7 +596,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         /**
          * Returns completion exception.
          */
-        impl public val exception: Throwable
+        public actual val exception: Throwable
             get() =
                 _exception ?: // atomic read volatile var or else create new
                         CancellationException("Job was cancelled").also { _exception = it }
@@ -607,7 +607,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
     /**
      * A specific subclass of [CompletedExceptionally] for cancelled jobs.
      */
-    impl public class Cancelled actual constructor(
+    public actual class Cancelled actual constructor(
             cause: Throwable?
     ) : CompletedExceptionally(cause)
 
@@ -620,16 +620,16 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
      * =================================================================================================
      */
 
-    impl public val isCompletedExceptionally: Boolean get() = state is CompletedExceptionally
+    public actual val isCompletedExceptionally: Boolean get() = state is CompletedExceptionally
 
-    impl protected fun getCompletedInternal(): Any? {
+    protected actual fun getCompletedInternal(): Any? {
         val state = this.state
         check(state !is Incomplete) { "This job has not completed yet" }
         if (state is CompletedExceptionally) throw state.exception
         return state
     }
 
-    impl protected suspend fun awaitInternal(): Any? {
+    protected actual suspend fun awaitInternal(): Any? {
         // fast-path -- check state (avoid extra object creation)
         while (true) { // lock-free loop on state
             val state = this.state
@@ -655,7 +655,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         })
     }
 
-    impl protected fun <R> registerSelectAwaitInternal(select: SelectInstance<R>, block: suspend (Any?) -> R) {
+    protected actual fun <R> registerSelectAwaitInternal(select: SelectInstance<R>, block: suspend (Any?) -> R) {
         // fast-path -- check state and select/return if needed
         lockFreeLoopOnState { state ->
             if (select.isSelected) return
@@ -677,7 +677,7 @@ impl public open class JobSupport actual constructor(active: Boolean) : Abstract
         }
     }
 
-    impl internal fun <R> selectAwaitCompletion(select: SelectInstance<R>, block: suspend (Any?) -> R) {
+    internal actual fun <R> selectAwaitCompletion(select: SelectInstance<R>, block: suspend (Any?) -> R) {
         val state = this.state
         // Note: await is non-atomic (can be cancelled while dispatched)
         if (state is CompletedExceptionally)

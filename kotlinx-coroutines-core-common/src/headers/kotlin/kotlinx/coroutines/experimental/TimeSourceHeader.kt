@@ -1,6 +1,6 @@
 package kotlinx.coroutines.experimental
 
-header internal interface TimeSource {
+internal expect interface TimeSource {
     fun nanoTime(): Long
     fun trackTask(block: Runnable): Runnable
     fun unTrackTask()
@@ -8,4 +8,4 @@ header internal interface TimeSource {
     fun unregisterTimeLoopThread()
 }
 
-header internal var timeSource: TimeSource
+internal expect var timeSource: TimeSource

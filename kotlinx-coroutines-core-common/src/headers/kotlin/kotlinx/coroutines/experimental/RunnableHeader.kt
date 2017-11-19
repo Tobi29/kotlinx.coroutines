@@ -1,5 +1,5 @@
 package kotlinx.coroutines.experimental
 
-header interface Runnable {
+expect interface Runnable {
     fun run()
 }

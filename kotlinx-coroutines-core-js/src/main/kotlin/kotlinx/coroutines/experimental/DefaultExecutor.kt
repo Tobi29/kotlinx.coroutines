@@ -17,13 +17,13 @@
 package kotlinx.coroutines.experimental
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-impl internal object DefaultExecutor : EventLoopBase(), Runnable {
-    impl override val canComplete: Boolean get() = false
-    impl override val isCompleted: Boolean get() = false
+internal actual object DefaultExecutor : EventLoopBase(), Runnable {
+    actual override val canComplete: Boolean get() = false
+    actual override val isCompleted: Boolean get() = false
 
     private var timeoutHandle: Int? = null
 
-    impl override fun run() {
+    actual override fun run() {
         timeoutHandle = null
         val next = TimeUnit.NANOSECONDS.toMillis(processNextEvent())
         if (next <= Int.MAX_VALUE) {
@@ -31,19 +31,19 @@ impl internal object DefaultExecutor : EventLoopBase(), Runnable {
         }
     }
 
-    impl override fun unpark() {
+    actual override fun unpark() {
         timeoutHandle?.let { clearTimeout(it) }
         timeoutHandle = setTimeout({ run() }, 0)
     }
 
-    impl override fun isCorrectThread(): Boolean = true
+    actual override fun isCorrectThread(): Boolean = true
 
     // used for tests
-    impl internal fun ensureStarted() {
+    internal actual fun ensureStarted() {
     }
 
     // used for tests
-    impl internal fun shutdown(timeout: Long) {
+    internal actual fun shutdown(timeout: Long) {
         timeoutHandle?.let {
             clearTimeout(it)
             timeoutHandle = null

@@ -27,7 +27,7 @@ import kotlinx.coroutines.experimental.selects.SelectInstance
  * This implementation uses lock to protect the buffer, which is held only during very short buffer-update operations.
  * The lists of suspended senders or receivers are lock-free.
  */
-header public open class ArrayChannel<E>(
+public expect open class ArrayChannel<E>(
         /**
          * Buffer capacity.
          */

@@ -23,7 +23,7 @@ import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
 
 // --------------- basic coroutine builders ---------------
 
-impl internal fun launchImpl(
+internal actual fun launchImpl(
         context: CoroutineContext,
         start: CoroutineStart,
         block: suspend CoroutineScope.() -> Unit
@@ -37,7 +37,7 @@ impl internal fun launchImpl(
     return coroutine
 }
 
-impl internal suspend fun <T> runImpl(
+internal actual suspend fun <T> runImpl(
         context: CoroutineContext,
         start: CoroutineStart,
         block: suspend () -> T
@@ -68,7 +68,7 @@ impl internal suspend fun <T> runImpl(
     completion.getResult()
 }
 
-impl internal fun <T> runBlockingImpl(
+internal actual fun <T> runBlockingImpl(
         context: CoroutineContext,
         block: suspend CoroutineScope.() -> T
 ): T {

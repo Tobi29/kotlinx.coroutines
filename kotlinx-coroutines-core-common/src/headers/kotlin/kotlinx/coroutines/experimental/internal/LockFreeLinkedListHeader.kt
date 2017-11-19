@@ -16,7 +16,7 @@ package kotlinx.coroutines.experimental.internal
  * @suppress **This is unstable API and it is subject to change.**
  */
 @Suppress("LeakingThis")
-header public open class LockFreeLinkedListNode() {
+public expect open class LockFreeLinkedListNode() {
     @PublishedApi
     internal abstract class CondAddOp(
             newNode: Node

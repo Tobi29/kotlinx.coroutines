@@ -84,7 +84,7 @@ public interface Mutex {
  */
 public fun Mutex(locked: Boolean = false): Mutex = MutexNewImpl(locked)
 
-header internal fun MutexNewImpl(locked: Boolean): Mutex
+internal expect fun MutexNewImpl(locked: Boolean): Mutex
 
 /**
  * Executes the given [action] under this mutex's lock.

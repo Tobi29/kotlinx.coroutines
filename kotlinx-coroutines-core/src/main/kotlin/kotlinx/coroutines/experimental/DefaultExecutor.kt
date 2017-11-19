@@ -17,10 +17,10 @@
 package kotlinx.coroutines.experimental
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-impl internal object DefaultExecutor : EventLoopBase(), Runnable {
+internal actual object DefaultExecutor : EventLoopBase(), Runnable {
 
-    impl override val canComplete: Boolean get() = false
-    impl override val isCompleted: Boolean get() = false
+    actual override val canComplete: Boolean get() = false
+    actual override val isCompleted: Boolean get() = false
 
     private const val DEFAULT_KEEP_ALIVE = 1000L // in milliseconds
 
@@ -42,7 +42,7 @@ impl internal object DefaultExecutor : EventLoopBase(), Runnable {
     @Volatile
     private var debugStatus: Int = FRESH
 
-    impl override fun run() {
+    actual override fun run() {
         var shutdownNanos = Long.MAX_VALUE
         timeSource.registerTimeLoopThread()
         notifyStartup()
@@ -90,15 +90,15 @@ impl internal object DefaultExecutor : EventLoopBase(), Runnable {
                 start()
             }
 
-    impl override fun unpark() {
+    actual override fun unpark() {
         timeSource.unpark(thread()) // as a side effect creates thread if it is not there
     }
 
-    impl override fun isCorrectThread(): Boolean = true
+    actual override fun isCorrectThread(): Boolean = true
 
     // used for tests
     @Synchronized
-    impl internal fun ensureStarted() {
+    internal actual fun ensureStarted() {
         assert(_thread == null) // ensure we are at a clean state
         debugStatus = FRESH
         createThreadSync() // create fresh thread
@@ -113,7 +113,7 @@ impl internal object DefaultExecutor : EventLoopBase(), Runnable {
 
     // used for tests
     @Synchronized
-    impl internal fun shutdown(timeout: Long) {
+    internal actual fun shutdown(timeout: Long) {
         if (_thread != null) {
             val deadline = System.currentTimeMillis() + timeout
             if (debugStatus == ACTIVE) debugStatus = SHUTDOWN_REQ

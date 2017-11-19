@@ -3,7 +3,7 @@ package kotlinx.coroutines.experimental
 import kotlin.coroutines.experimental.CoroutineContext
 
 // for tests only
-header internal fun resetCoroutineId()
+internal expect fun resetCoroutineId()
 
 /**
  * Creates context for the new coroutine with optional support for debugging facilities (when turned on).
@@ -23,10 +23,10 @@ header internal fun resetCoroutineId()
  * Coroutine name can be explicitly assigned using [CoroutineName] context element.
  * The string "coroutine" is used as a default name.
  */
-header public fun newCoroutineContext(context: CoroutineContext): CoroutineContext
+public expect fun newCoroutineContext(context: CoroutineContext): CoroutineContext
 
 @PublishedApi
-header internal fun updateContext(context: CoroutineContext): String?
+internal expect fun updateContext(context: CoroutineContext): String?
 
 @PublishedApi
-header internal fun restoreContext(oldName: String?)
+internal expect fun restoreContext(oldName: String?)

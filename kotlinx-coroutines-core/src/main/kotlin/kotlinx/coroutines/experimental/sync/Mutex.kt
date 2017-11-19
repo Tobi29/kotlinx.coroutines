@@ -24,7 +24,7 @@ import kotlinx.coroutines.experimental.selects.SelectInstance
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
 import kotlin.coroutines.experimental.startCoroutine
 
-impl internal fun MutexNewImpl(locked: Boolean): Mutex = MutexImpl(locked)
+internal actual fun MutexNewImpl(locked: Boolean): Mutex = MutexImpl(locked)
 
 internal class MutexImpl(locked: Boolean) : Mutex {
     // State is: Empty | LockedQueue | OpDescriptor

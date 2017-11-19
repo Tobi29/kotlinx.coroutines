@@ -16,12 +16,12 @@
 
 package kotlinx.coroutines.experimental
 
-impl internal interface TimeSource {
-    impl fun nanoTime(): Long
-    impl fun trackTask(block: Runnable): Runnable
-    impl fun unTrackTask()
-    impl fun registerTimeLoopThread()
-    impl fun unregisterTimeLoopThread()
+internal actual interface TimeSource {
+    actual fun nanoTime(): Long
+    actual fun trackTask(block: Runnable): Runnable
+    actual fun unTrackTask()
+    actual fun registerTimeLoopThread()
+    actual fun unregisterTimeLoopThread()
 }
 
 internal object DefaultTimeSource : TimeSource {
@@ -32,7 +32,7 @@ internal object DefaultTimeSource : TimeSource {
     override fun unregisterTimeLoopThread() {}
 }
 
-impl internal var timeSource: TimeSource = DefaultTimeSource
+internal actual var timeSource: TimeSource = DefaultTimeSource
 
 private external val performance: Performance
 

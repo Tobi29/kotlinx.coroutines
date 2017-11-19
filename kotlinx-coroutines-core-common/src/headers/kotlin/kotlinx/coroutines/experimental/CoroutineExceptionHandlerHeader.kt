@@ -12,4 +12,4 @@ import kotlin.coroutines.experimental.CoroutineContext
  *   returns `true` (it was still active), then the exception is considered to be handled.
  * * Otherwise, current thread's [Thread.uncaughtExceptionHandler] is used.
  */
-header fun handleCoroutineException(context: CoroutineContext, exception: Throwable)
+expect fun handleCoroutineException(context: CoroutineContext, exception: Throwable)

@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater
  *
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl public abstract class AtomicOp<in T> : OpDescriptor() {
+public actual abstract class AtomicOp<in T> : OpDescriptor() {
     @Volatile
     private var _consensus: Any? = UNDECIDED
 
@@ -41,22 +41,22 @@ impl public abstract class AtomicOp<in T> : OpDescriptor() {
         private val UNDECIDED: Any = Symbol("UNDECIDED")
     }
 
-    impl val isDecided: Boolean get() = _consensus !== UNDECIDED
+    actual val isDecided: Boolean get() = _consensus !== UNDECIDED
 
-    impl fun tryDecide(decision: Any?): Boolean {
+    actual fun tryDecide(decision: Any?): Boolean {
         check(decision !== UNDECIDED)
         return CONSENSUS.compareAndSet(this, UNDECIDED, decision)
     }
 
     private fun decide(decision: Any?): Any? = if (tryDecide(decision)) decision else _consensus
 
-    impl abstract fun prepare(affected: T): Any? // `null` if Ok, or failure reason
+    actual abstract fun prepare(affected: T): Any? // `null` if Ok, or failure reason
 
-    impl abstract fun complete(affected: T, failure: Any?) // failure != null if failed to prepare op
+    actual abstract fun complete(affected: T, failure: Any?) // failure != null if failed to prepare op
 
     // returns `null` on success
-    @Suppress("UNCHECKED_CAST")
-    impl final override fun perform(affected: Any?): Any? {
+    @Suppress("UNCHECKED_CAST") actual
+    final override fun perform(affected: Any?): Any? {
         // make decision on status
         var decision = this._consensus
         if (decision === UNDECIDED)

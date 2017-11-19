@@ -25,7 +25,7 @@ import java.util.concurrent.locks.LockSupport
  * It may optionally implement [Delay] interface and support time-scheduled tasks. It is used by [runBlocking] to
  * continue processing events when invoked from the event dispatch thread.
  */
-impl public interface EventLoop {
+public actual interface EventLoop {
     /**
      * Processes next event in this event loop.
      *
@@ -34,7 +34,7 @@ impl public interface EventLoop {
      * * `> 0` -- a number of nanoseconds to wait for next scheduled event;
      * * [Long.MAX_VALUE] -- no more events, or was invoked from the wrong thread.
      */
-    impl public fun processNextEvent(): Long
+    public actual fun processNextEvent(): Long
 
     /** @suppress **Deprecated **/
     @Deprecated(message = "Companion object to be removed, no replacement")

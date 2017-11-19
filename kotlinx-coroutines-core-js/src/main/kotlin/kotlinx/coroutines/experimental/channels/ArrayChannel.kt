@@ -28,11 +28,11 @@ import kotlinx.coroutines.experimental.selects.SelectInstance
  * This implementation uses lock to protect the buffer, which is held only during very short buffer-update operations.
  * The lists of suspended senders or receivers are lock-free.
  */
-impl public open class ArrayChannel<E> actual constructor(
+public actual open class ArrayChannel<E> actual constructor(
         /**
          * Buffer capacity.
          */
-        impl val capacity: Int
+        actual val capacity: Int
 ) : AbstractChannel<E>() {
     init {
         require(capacity >= 1) { "ArrayChannel capacity must be at least 1, but $capacity was specified" }
@@ -43,13 +43,13 @@ impl public open class ArrayChannel<E> actual constructor(
     @Volatile
     private var size: Int = 0
 
-    impl protected final override val isBufferAlwaysEmpty: Boolean get() = false
-    impl protected final override val isBufferEmpty: Boolean get() = size == 0
-    impl protected final override val isBufferAlwaysFull: Boolean get() = false
-    impl protected final override val isBufferFull: Boolean get() = size == capacity
+    protected actual final override val isBufferAlwaysEmpty: Boolean get() = false
+    protected actual final override val isBufferEmpty: Boolean get() = size == 0
+    protected actual final override val isBufferAlwaysFull: Boolean get() = false
+    protected actual final override val isBufferFull: Boolean get() = size == capacity
 
     // result is `OFFER_SUCCESS | OFFER_FAILED | Closed`
-    impl protected override fun offerInternal(element: E): Any {
+    protected actual override fun offerInternal(element: E): Any {
         val size = this.size
         closedForSend?.let { return it }
         if (size < capacity) {
@@ -80,7 +80,7 @@ impl public open class ArrayChannel<E> actual constructor(
     }
 
     // result is `ALREADY_SELECTED | OFFER_SUCCESS | OFFER_FAILED | Closed`
-    impl protected override fun offerSelectInternal(element: E, select: SelectInstance<*>): Any {
+    protected actual override fun offerSelectInternal(element: E, select: SelectInstance<*>): Any {
         val size = this.size
         closedForSend?.let { return it }
         if (size < capacity) {
@@ -123,7 +123,7 @@ impl public open class ArrayChannel<E> actual constructor(
     }
 
     // result is `E | POLL_FAILED | Closed`
-    impl protected override fun pollInternal(): Any? {
+    protected actual override fun pollInternal(): Any? {
         var send: Send? = null
         var token: Any? = null
         val size = this.size
@@ -156,7 +156,7 @@ impl public open class ArrayChannel<E> actual constructor(
     }
 
     // result is `ALREADY_SELECTED | E | POLL_FAILED | Closed`
-    impl protected override fun pollSelectInternal(select: SelectInstance<*>): Any? {
+    protected actual override fun pollSelectInternal(select: SelectInstance<*>): Any? {
         var send: Send? = null
         var token: Any? = null
         val size = this.size

@@ -1,6 +1,6 @@
 package kotlinx.coroutines.experimental
 
-header enum class TimeUnit {
+expect enum class TimeUnit {
     NANOSECONDS,
     MICROSECONDS,
     MILLISECONDS,

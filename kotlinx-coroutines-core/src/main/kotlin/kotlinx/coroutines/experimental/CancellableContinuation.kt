@@ -26,7 +26,7 @@ import kotlin.coroutines.experimental.suspendCoroutine
 // --------------- cancellable continuations ---------------
 
 @PublishedApi
-impl internal inline suspend fun <T> suspendCancellableCoroutineImpl(
+internal actual inline suspend fun <T> suspendCancellableCoroutineImpl(
     holdCancellability: Boolean,
     crossinline block: (CancellableContinuation<T>) -> Unit
 ): T =
@@ -38,7 +38,7 @@ impl internal inline suspend fun <T> suspendCancellableCoroutineImpl(
     }
 
 @PublishedApi
-impl internal inline suspend fun <T> suspendAtomicCancellableCoroutineImpl(
+internal actual inline suspend fun <T> suspendAtomicCancellableCoroutineImpl(
     holdCancellability: Boolean,
     crossinline block: (CancellableContinuation<T>) -> Unit
 ): T =
@@ -49,7 +49,7 @@ impl internal inline suspend fun <T> suspendAtomicCancellableCoroutineImpl(
         cancellable.getResult()
     }
 
-impl public fun CancellableContinuation<*>.removeOnCancel(node: LockFreeLinkedListNode): DisposableHandle =
+public actual fun CancellableContinuation<*>.removeOnCancel(node: LockFreeLinkedListNode): DisposableHandle =
     invokeOnCompletion(RemoveOnCancel(this, node))
 
 // --------------- implementation details ---------------

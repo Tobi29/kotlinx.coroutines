@@ -19,14 +19,14 @@ package kotlinx.coroutines.experimental
 import kotlin.coroutines.experimental.CoroutineContext
 
 // for tests only
-impl internal fun resetCoroutineId() {
+internal actual fun resetCoroutineId() {
 }
 
-impl public fun newCoroutineContext(context: CoroutineContext): CoroutineContext = context
+public actual fun newCoroutineContext(context: CoroutineContext): CoroutineContext = context
 
 @PublishedApi
-impl internal fun updateContext(context: CoroutineContext): String? = null
+internal actual fun updateContext(context: CoroutineContext): String? = null
 
 @PublishedApi
-impl internal fun restoreContext(oldName: String?) {
+internal actual fun restoreContext(oldName: String?) {
 }

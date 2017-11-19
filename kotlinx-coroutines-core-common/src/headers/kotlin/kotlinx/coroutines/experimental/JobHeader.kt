@@ -15,7 +15,7 @@ import kotlin.coroutines.experimental.AbstractCoroutineContextElement
  * @param active when `true` the job is created in _active_ state, when `false` in _new_ state. See [Job] for details.
  * @suppress **This is unstable API and it is subject to change.**
  */
-header public open class JobSupport(active: Boolean) : AbstractCoroutineContextElement, Job {
+public expect open class JobSupport(active: Boolean) : AbstractCoroutineContextElement, Job {
     /*
        === Internal states ===
 
@@ -222,7 +222,7 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
 /**
  * Thrown by cancellable suspending functions if the [Job] of the coroutine is cancelled while it is suspending.
  */
-header open class CancellationException : IllegalStateException {
+expect open class CancellationException : IllegalStateException {
     constructor()
 
     constructor(message: String)

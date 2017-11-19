@@ -24,16 +24,16 @@ import kotlinx.coroutines.experimental.internal.LockFreeLinkedListNode
  * Removes a given node on cancellation.
  * @suppress **This is unstable API and it is subject to change.**
  */
-header public fun CancellableContinuation<*>.removeOnCancel(node: LockFreeLinkedListNode): DisposableHandle
+public expect fun CancellableContinuation<*>.removeOnCancel(node: LockFreeLinkedListNode): DisposableHandle
 
 @PublishedApi
-header internal inline suspend fun <T> suspendCancellableCoroutineImpl(
+internal expect inline suspend fun <T> suspendCancellableCoroutineImpl(
         holdCancellability: Boolean,
         crossinline block: (CancellableContinuation<T>) -> Unit
 ): T
 
 @PublishedApi
-header internal inline suspend fun <T> suspendAtomicCancellableCoroutineImpl(
+internal expect inline suspend fun <T> suspendAtomicCancellableCoroutineImpl(
         holdCancellability: Boolean,
         crossinline block: (CancellableContinuation<T>) -> Unit
 ): T

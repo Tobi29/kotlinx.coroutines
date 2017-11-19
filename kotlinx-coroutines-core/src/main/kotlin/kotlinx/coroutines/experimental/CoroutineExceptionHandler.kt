@@ -18,7 +18,7 @@ package kotlinx.coroutines.experimental
 
 import kotlin.coroutines.experimental.CoroutineContext
 
-impl fun handleCoroutineException(context: CoroutineContext, exception: Throwable) {
+actual fun handleCoroutineException(context: CoroutineContext, exception: Throwable) {
     context[CoroutineExceptionHandler]?.let {
         it.handleException(context, exception)
         return

@@ -5,37 +5,37 @@ package kotlinx.coroutines.experimental.internal
  *
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl public class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable<T> {
+public actual class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable<T> {
     private var a: Array<T?>? = null
 
     @PublishedApi
-    impl internal var size = 0
+    internal actual var size = 0
 
-    impl public val isEmpty: Boolean get() = size == 0
+    public actual val isEmpty: Boolean get() = size == 0
 
-    impl public fun peek(): T? = firstImpl()
+    public actual fun peek(): T? = firstImpl()
 
-    impl public fun removeFirstOrNull(): T? =
+    public actual fun removeFirstOrNull(): T? =
             if (size > 0) {
                 removeAtImpl(0)
             } else null
 
-    impl public inline fun removeFirstIf(predicate: (T) -> Boolean): T? {
+    public actual inline fun removeFirstIf(predicate: (T) -> Boolean): T? {
         val first = firstImpl() ?: return null
         return if (predicate(first)) {
             removeAtImpl(0)
         } else null
     }
 
-    impl public fun addLast(node: T) = addImpl(node)
+    public actual fun addLast(node: T) = addImpl(node)
 
-    impl public fun addLastIf(node: T, cond: () -> Boolean): Boolean =
+    public actual fun addLastIf(node: T, cond: () -> Boolean): Boolean =
             if (cond()) {
                 addImpl(node)
                 true
             } else false
 
-    impl public fun remove(node: T): Boolean =
+    public actual fun remove(node: T): Boolean =
             if (node.index < 0) {
                 false
             } else {
@@ -44,10 +44,10 @@ impl public class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable
             }
 
     @PublishedApi
-    impl internal fun firstImpl(): T? = a?.get(0)
+    internal actual fun firstImpl(): T? = a?.get(0)
 
     @PublishedApi
-    impl internal fun removeAtImpl(index: Int): T {
+    internal actual fun removeAtImpl(index: Int): T {
         check(size > 0)
         val a = this.a!!
         size--
@@ -70,7 +70,7 @@ impl public class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable
     }
 
     @PublishedApi
-    impl internal fun addImpl(node: T) {
+    internal actual fun addImpl(node: T) {
         val a = realloc()
         var i = size++
         a[i] = node

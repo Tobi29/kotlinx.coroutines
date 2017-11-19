@@ -1,5 +1,5 @@
 package kotlinx.coroutines.experimental
 
-impl interface Runnable {
-    impl fun run()
+actual interface Runnable {
+    actual fun run()
 }

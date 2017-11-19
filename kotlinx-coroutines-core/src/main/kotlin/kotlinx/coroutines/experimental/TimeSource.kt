@@ -18,12 +18,12 @@ package kotlinx.coroutines.experimental
 
 import java.util.concurrent.locks.LockSupport
 
-impl internal interface TimeSource {
-    impl fun nanoTime(): Long
-    impl fun trackTask(block: Runnable): Runnable
-    impl fun unTrackTask()
-    impl fun registerTimeLoopThread()
-    impl fun unregisterTimeLoopThread()
+internal actual interface TimeSource {
+    actual fun nanoTime(): Long
+    actual fun trackTask(block: Runnable): Runnable
+    actual fun unTrackTask()
+    actual fun registerTimeLoopThread()
+    actual fun unregisterTimeLoopThread()
     fun parkNanos(blocker: Any, nanos: Long) // should return immediately when nanos <= 0
     fun unpark(thread: Thread)
 }
@@ -44,13 +44,13 @@ internal object DefaultTimeSource : TimeSource {
     }
 }
 
-impl internal var timeSource: TimeSource = DefaultTimeSource
+internal actual var timeSource: TimeSource = DefaultTimeSource
 
 // actual typealias TimeUnit = java.util.concurrent.TimeUnit
 
 typealias JTimeUnit = java.util.concurrent.TimeUnit
 
-impl enum class TimeUnit(val java: JTimeUnit) {
+actual enum class TimeUnit(val java: JTimeUnit) {
     NANOSECONDS(JTimeUnit.NANOSECONDS),
     MICROSECONDS(JTimeUnit.MICROSECONDS),
     MILLISECONDS(JTimeUnit.MILLISECONDS),
@@ -59,28 +59,28 @@ impl enum class TimeUnit(val java: JTimeUnit) {
     HOURS(JTimeUnit.HOURS),
     DAYS(JTimeUnit.DAYS);
 
-    impl open fun convert(sourceDuration: Long,
-                          sourceUnit: TimeUnit) =
+    actual open fun convert(sourceDuration: Long,
+                            sourceUnit: TimeUnit) =
             java.convert(sourceDuration, sourceUnit.java)
 
-    impl open fun toNanos(duration: Long) =
+    actual open fun toNanos(duration: Long) =
             java.toNanos(duration)
 
-    impl open fun toMicros(duration: Long) =
+    actual open fun toMicros(duration: Long) =
             java.toMicros(duration)
 
-    impl open fun toMillis(duration: Long) =
+    actual open fun toMillis(duration: Long) =
             java.toMillis(duration)
 
-    impl open fun toSeconds(duration: Long) =
+    actual open fun toSeconds(duration: Long) =
             java.toSeconds(duration)
 
-    impl open fun toMinutes(duration: Long) =
+    actual open fun toMinutes(duration: Long) =
             java.toMinutes(duration)
 
-    impl open fun toHours(duration: Long) =
+    actual open fun toHours(duration: Long) =
             java.toHours(duration)
 
-    impl open fun toDays(duration: Long) =
+    actual open fun toDays(duration: Long) =
             java.toDays(duration)
 }
