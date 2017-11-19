@@ -21,7 +21,7 @@ import kotlin.coroutines.experimental.Continuation
 /**
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl internal abstract class AbstractContinuation<in T>(
+impl internal abstract class AbstractContinuation<in T> actual constructor(
         active: Boolean,
         impl protected val resumeMode: Int
 ) : JobSupport(active), Continuation<T> {

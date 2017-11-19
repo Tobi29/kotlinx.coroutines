@@ -45,3 +45,42 @@ internal object DefaultTimeSource : TimeSource {
 }
 
 impl internal var timeSource: TimeSource = DefaultTimeSource
+
+// actual typealias TimeUnit = java.util.concurrent.TimeUnit
+
+typealias JTimeUnit = java.util.concurrent.TimeUnit
+
+impl enum class TimeUnit(val java: JTimeUnit) {
+    NANOSECONDS(JTimeUnit.NANOSECONDS),
+    MICROSECONDS(JTimeUnit.MICROSECONDS),
+    MILLISECONDS(JTimeUnit.MILLISECONDS),
+    SECONDS(JTimeUnit.SECONDS),
+    MINUTES(JTimeUnit.MINUTES),
+    HOURS(JTimeUnit.HOURS),
+    DAYS(JTimeUnit.DAYS);
+
+    impl open fun convert(sourceDuration: Long,
+                          sourceUnit: TimeUnit) =
+            java.convert(sourceDuration, sourceUnit.java)
+
+    impl open fun toNanos(duration: Long) =
+            java.toNanos(duration)
+
+    impl open fun toMicros(duration: Long) =
+            java.toMicros(duration)
+
+    impl open fun toMillis(duration: Long) =
+            java.toMillis(duration)
+
+    impl open fun toSeconds(duration: Long) =
+            java.toSeconds(duration)
+
+    impl open fun toMinutes(duration: Long) =
+            java.toMinutes(duration)
+
+    impl open fun toHours(duration: Long) =
+            java.toHours(duration)
+
+    impl open fun toDays(duration: Long) =
+            java.toDays(duration)
+}

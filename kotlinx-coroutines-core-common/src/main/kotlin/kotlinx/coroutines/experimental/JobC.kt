@@ -346,11 +346,6 @@ public interface CompletionHandler {
 }
 
 /**
- * Thrown by cancellable suspending functions if the [Job] of the coroutine is cancelled while it is suspending.
- */
-public typealias CancellationException = java.util.concurrent.CancellationException
-
-/**
  * Unregisters a specified [registration] when this job is complete.
  *
  * This is a shortcut for the following code with slightly more efficient implementation (one fewer object created).

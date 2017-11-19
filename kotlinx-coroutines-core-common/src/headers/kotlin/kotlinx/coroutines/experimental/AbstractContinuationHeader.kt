@@ -24,7 +24,7 @@ import kotlin.coroutines.experimental.Continuation
 header internal abstract class AbstractContinuation<in T>(
         active: Boolean,
         resumeMode: Int
-) : JobSupport(active), Continuation<T> {
+) : JobSupport, Continuation<T> {
     protected val resumeMode: Int
 
     /* decision state machine
@@ -42,7 +42,7 @@ header internal abstract class AbstractContinuation<in T>(
         Note: both tryResume and trySuspend can be invoked at most once, first invocation wins
      */
 
-    header protected companion object {
+    protected companion object {
         val UNDECIDED: Int
         val SUSPENDED: Int
         val RESUMED: Int

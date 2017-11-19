@@ -21,7 +21,7 @@ package kotlinx.coroutines.experimental.internal
  *
  * @suppress **This is unstable API and it is subject to change.**
  */
-header public class ThreadSafeHeap<T> where T : ThreadSafeHeapNode, T : Comparable<T> {
+header public class ThreadSafeHeap<T>() where T : ThreadSafeHeapNode, T : Comparable<T> {
     @PublishedApi
     internal var size: Int
 

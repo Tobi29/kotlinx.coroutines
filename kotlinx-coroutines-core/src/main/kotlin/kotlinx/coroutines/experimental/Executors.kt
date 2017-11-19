@@ -51,7 +51,7 @@ internal abstract class ExecutorCoroutineDispatcherBase : CoroutineDispatcher(),
     override fun scheduleResumeAfterDelay(time: Long, unit: TimeUnit, continuation: CancellableContinuation<Unit>) {
         val timeout =
             try { (executor as? ScheduledExecutorService)
-                ?.schedule(ResumeUndispatchedRunnable(this, continuation), time, unit) }
+                ?.schedule(ResumeUndispatchedRunnable(this, continuation), time, unit.java) }
             catch (e: RejectedExecutionException) { null }
         if (timeout != null)
             continuation.cancelFutureOnCompletion(timeout)
@@ -62,7 +62,7 @@ internal abstract class ExecutorCoroutineDispatcherBase : CoroutineDispatcher(),
     override fun invokeOnTimeout(time: Long, unit: TimeUnit, block: Runnable): DisposableHandle {
         val timeout =
             try { (executor as? ScheduledExecutorService)
-                ?.schedule(block, time, unit) }
+                ?.schedule(block, time, unit.java) }
             catch (e: RejectedExecutionException) { null }
         if (timeout != null)
             return DisposableFutureHandle(timeout)

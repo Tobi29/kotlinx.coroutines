@@ -16,9 +16,9 @@ package kotlinx.coroutines.experimental.internal
  * @suppress **This is unstable API and it is subject to change.**
  */
 @Suppress("LeakingThis")
-header public open class LockFreeLinkedListNode {
+header public open class LockFreeLinkedListNode() {
     @PublishedApi
-    header internal abstract class CondAddOp(
+    internal abstract class CondAddOp(
             newNode: Node
     ) : AtomicOp<Node> {
         val newNode: Node
@@ -97,10 +97,10 @@ header public open class LockFreeLinkedListNode {
 
     // ------ multi-word atomic operations helpers ------
 
-    header public open class AddLastDesc<out T : Node>(
+    public open class AddLastDesc<out T : Node>(
             queue: Node,
             node: T
-    ) : AbstractAtomicDesc() {
+    ) : AbstractAtomicDesc {
         val queue: Node
         val node: T
 
@@ -118,9 +118,9 @@ header public open class LockFreeLinkedListNode {
         override fun finishOnSuccess(affected: Node, next: Node)
     }
 
-    header public open class RemoveFirstDesc<T>(
+    public open class RemoveFirstDesc<T>(
             queue: Node
-    ) : AbstractAtomicDesc() {
+    ) : AbstractAtomicDesc {
         val queue: Node
 
         public val result: T
@@ -144,7 +144,7 @@ header public open class LockFreeLinkedListNode {
         final override fun finishOnSuccess(affected: Node, next: Node)
     }
 
-    header public abstract class AbstractAtomicDesc : AtomicDesc() {
+    public abstract class AbstractAtomicDesc : AtomicDesc {
         protected abstract val affectedNode: Node?
         protected abstract val originalNext: Node?
         protected open fun takeAffectedNode(op: OpDescriptor): Node

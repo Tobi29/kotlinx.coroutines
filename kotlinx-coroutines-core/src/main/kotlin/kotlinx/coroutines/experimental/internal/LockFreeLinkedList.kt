@@ -59,7 +59,7 @@ impl public open class LockFreeLinkedListNode {
             _removedRef ?: Removed(this).also { REMOVED_REF.lazySet(this, it) }
 
     @PublishedApi
-    impl internal abstract class CondAddOp(
+    impl internal abstract class CondAddOp actual constructor(
             @JvmField impl val newNode: Node
     ) : AtomicOp<Node>() {
         @JvmField
@@ -271,7 +271,7 @@ impl public open class LockFreeLinkedListNode {
 
     // ------ multi-word atomic operations helpers ------
 
-    impl public open class AddLastDesc<out T : Node>(
+    impl public open class AddLastDesc<out T : Node> actual constructor(
             @JvmField impl val queue: Node,
             @JvmField impl val node: T
     ) : AbstractAtomicDesc() {
@@ -318,7 +318,7 @@ impl public open class LockFreeLinkedListNode {
         }
     }
 
-    impl public open class RemoveFirstDesc<T>(
+    impl public open class RemoveFirstDesc<T> actual constructor(
             @JvmField impl val queue: Node
     ) : AbstractAtomicDesc() {
         @Suppress("UNCHECKED_CAST")

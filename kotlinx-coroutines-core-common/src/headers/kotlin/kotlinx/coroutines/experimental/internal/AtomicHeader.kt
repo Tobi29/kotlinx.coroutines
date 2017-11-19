@@ -11,7 +11,7 @@ package kotlinx.coroutines.experimental.internal
  *
  * @suppress **This is unstable API and it is subject to change.**
  */
-header public abstract class AtomicOp<in T> : OpDescriptor() {
+header public abstract class AtomicOp<in T> : OpDescriptor {
     val isDecided: Boolean
 
     fun tryDecide(decision: Any?): Boolean

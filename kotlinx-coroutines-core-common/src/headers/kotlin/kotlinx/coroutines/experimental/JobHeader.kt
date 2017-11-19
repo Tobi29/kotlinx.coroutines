@@ -15,7 +15,7 @@ import kotlin.coroutines.experimental.AbstractCoroutineContextElement
  * @param active when `true` the job is created in _active_ state, when `false` in _new_ state. See [Job] for details.
  * @suppress **This is unstable API and it is subject to change.**
  */
-header public open class JobSupport(active: Boolean) : AbstractCoroutineContextElement(Job), Job {
+header public open class JobSupport(active: Boolean) : AbstractCoroutineContextElement, Job {
     /*
        === Internal states ===
 
@@ -69,7 +69,7 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
            FINAL_C (Cancelled) state on cancellation/completion
      */
 
-    header protected companion object {
+    protected companion object {
         fun stateToString(state: Any?): String
     }
 
@@ -172,7 +172,7 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
     /**
      * Interface for incomplete [state] of a job.
      */
-    header public interface Incomplete {
+    public interface Incomplete {
         val isActive: Boolean
     }
 
@@ -182,7 +182,7 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
      * @param cause the exceptional completion cause. If `cause` is null, then a [CancellationException]
      *        if created on first get from [exception] property.
      */
-    header public open class CompletedExceptionally(
+    public open class CompletedExceptionally(
             cause: Throwable?
     ) {
         val cause: Throwable?
@@ -195,9 +195,9 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
     /**
      * A specific subclass of [CompletedExceptionally] for cancelled jobs.
      */
-    header public class Cancelled(
+    public class Cancelled(
             cause: Throwable?
-    ) : CompletedExceptionally(cause)
+    ) : CompletedExceptionally
 
 
     /*
@@ -217,4 +217,13 @@ header public open class JobSupport(active: Boolean) : AbstractCoroutineContextE
     protected fun <R> registerSelectAwaitInternal(select: SelectInstance<R>, block: suspend (Any?) -> R)
 
     internal fun <R> selectAwaitCompletion(select: SelectInstance<R>, block: suspend (Any?) -> R)
+}
+
+/**
+ * Thrown by cancellable suspending functions if the [Job] of the coroutine is cancelled while it is suspending.
+ */
+header open class CancellationException : IllegalStateException {
+    constructor()
+
+    constructor(message: String)
 }

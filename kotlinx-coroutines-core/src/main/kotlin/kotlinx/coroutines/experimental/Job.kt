@@ -50,7 +50,7 @@ public fun Job.cancelFutureOnCompletion(future: Future<*>): DisposableHandle =
  * @param active when `true` the job is created in _active_ state, when `false` in _new_ state. See [Job] for details.
  * @suppress **This is unstable API and it is subject to change.**
  */
-impl public open class JobSupport(active: Boolean) : AbstractCoroutineContextElement(Job), Job {
+impl public open class JobSupport actual constructor(active: Boolean) : AbstractCoroutineContextElement(Job), Job {
     /*
        === Internal states ===
 
@@ -587,7 +587,7 @@ impl public open class JobSupport(active: Boolean) : AbstractCoroutineContextEle
      * @param cause the exceptional completion cause. If `cause` is null, then a [CancellationException]
      *        if created on first get from [exception] property.
      */
-    impl public open class CompletedExceptionally(
+    impl public open class CompletedExceptionally actual constructor(
             @JvmField impl val cause: Throwable?
     ) {
         @Volatile
@@ -607,7 +607,7 @@ impl public open class JobSupport(active: Boolean) : AbstractCoroutineContextEle
     /**
      * A specific subclass of [CompletedExceptionally] for cancelled jobs.
      */
-    impl public class Cancelled(
+    impl public class Cancelled actual constructor(
             cause: Throwable?
     ) : CompletedExceptionally(cause)
 
@@ -725,3 +725,5 @@ private class CancelFutureOnCompletion(
     }
     override fun toString() = "CancelFutureOnCompletion[$future]"
 }
+
+actual typealias CancellationException = java.util.concurrent.CancellationException

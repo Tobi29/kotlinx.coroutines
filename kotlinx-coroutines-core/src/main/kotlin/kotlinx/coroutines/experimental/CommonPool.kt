@@ -80,7 +80,7 @@ object CommonPool : CoroutineDispatcher() {
         (_pool as? ExecutorService)?.apply {
             shutdown()
             if (timeout > 0)
-                awaitTermination(timeout, TimeUnit.MILLISECONDS)
+                awaitTermination(timeout, TimeUnit.MILLISECONDS.java)
             shutdownNow().forEach { DefaultExecutor.execute(it) }
         }
         _pool = Executor { throw RejectedExecutionException("CommonPool was shutdown") }

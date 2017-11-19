@@ -41,7 +41,7 @@ impl public open class LockFreeLinkedListNode {
             _removedRef ?: Removed(this).also { _removedRef = it }
 
     @PublishedApi
-    impl internal abstract class CondAddOp(
+    impl internal abstract class CondAddOp actual constructor(
             impl val newNode: Node
     ) : AtomicOp<Node>() {
         impl var oldNext: Node? = null
@@ -259,7 +259,7 @@ impl public open class LockFreeLinkedListNode {
 
     // ------ multi-word atomic operations helpers ------
 
-    impl public open class AddLastDesc<out T : Node>(
+    impl public open class AddLastDesc<out T : Node> actual constructor(
             impl val queue: Node,
             impl val node: T
     ) : AbstractAtomicDesc() {
@@ -306,7 +306,7 @@ impl public open class LockFreeLinkedListNode {
         }
     }
 
-    impl public open class RemoveFirstDesc<T>(
+    impl public open class RemoveFirstDesc<T> actual constructor(
             impl val queue: Node
     ) : AbstractAtomicDesc() {
         @Suppress("UNCHECKED_CAST")
